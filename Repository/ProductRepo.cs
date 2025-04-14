@@ -2,8 +2,8 @@
 {
     public class ProductRepo:GenericRepo<Product>, IProductIRepo
     {
-        ITIContext context;
-        public ProductRepo(ITIContext context) : base(context)
+        HandmadeContext context;
+        public ProductRepo(HandmadeContext context) : base(context)
         {
             this.context = context;
         }

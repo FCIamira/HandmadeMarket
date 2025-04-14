@@ -16,7 +16,7 @@ namespace HandmadeMarket
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddDbContext<ITIContext>(options =>
+            builder.Services.AddDbContext<HandmadeContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();

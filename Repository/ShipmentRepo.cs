@@ -2,8 +2,8 @@
 {
     public class ShipmentRepo:GenericRepo<Shipment>,IShipmentRepo
     {
-        ITIContext context;
-        public ShipmentRepo(ITIContext context) : base(context)
+        HandmadeContext context;
+        public ShipmentRepo(HandmadeContext context) : base(context)
         {
             this.context = context;
         }

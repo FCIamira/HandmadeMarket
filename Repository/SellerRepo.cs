@@ -2,8 +2,8 @@
 {
     public class SellerRepo : GenericRepo<Seller>, ISellerRepo
     {
-        ITIContext context;
-        public SellerRepo(ITIContext context) : base(context)
+        HandmadeContext context;
+        public SellerRepo(HandmadeContext context) : base(context)
         {
             this.context = context;
         }

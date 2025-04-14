@@ -6,9 +6,9 @@ namespace HandmadeMarket.Repository
 {
     public class GenericRepo<T> : IGenericRepo<T> where T : class
     {
-        ITIContext context;
+        HandmadeContext context;
         DbSet<T> _dbSet;
-        public GenericRepo(ITIContext _context)
+        public GenericRepo(HandmadeContext _context)
         {
             context = _context;
             _dbSet = _context.Set<T>();

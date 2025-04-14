@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HandmadeMarket.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class IntialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -153,15 +153,14 @@ namespace HandmadeMarket.Migrations
                 name: "Cart",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cart", x => x.Id);
+                    table.PrimaryKey("PK_Cart", x => new { x.CustomerId, x.Id });
                     table.ForeignKey(
                         name: "FK_Cart_Customers_CustomerId",
                         column: x => x.CustomerId,
@@ -180,14 +179,13 @@ namespace HandmadeMarket.Migrations
                 name: "Wishlist",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Wishlist", x => x.Id);
+                    table.PrimaryKey("PK_Wishlist", x => new { x.CustomerId, x.Id });
                     table.ForeignKey(
                         name: "FK_Wishlist_Customers_CustomerId",
                         column: x => x.CustomerId,
@@ -206,22 +204,15 @@ namespace HandmadeMarket.Migrations
                 name: "Items",
                 columns: table => new
                 {
-                    OrderItemId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderItemId = table.Column<int>(type: "int", nullable: false),
                     OrderId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false),
-                    CustomerId = table.Column<int>(type: "int", nullable: true)
+                    ProductId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Items", x => x.OrderItemId);
-                    table.ForeignKey(
-                        name: "FK_Items_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "Id");
+                    table.PrimaryKey("PK_Items", x => new { x.OrderItemId, x.OrderId });
                     table.ForeignKey(
                         name: "FK_Items_Orders_OrderId",
                         column: x => x.OrderId,
@@ -237,19 +228,9 @@ namespace HandmadeMarket.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cart_CustomerId",
-                table: "Cart",
-                column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Cart_ProductId",
                 table: "Cart",
                 column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Items_CustomerId",
-                table: "Items",
-                column: "CustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Items_OrderId",
@@ -289,11 +270,6 @@ namespace HandmadeMarket.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Shipments_CustomerId",
                 table: "Shipments",
-                column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Wishlist_CustomerId",
-                table: "Wishlist",
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(

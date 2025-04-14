@@ -12,14 +12,14 @@
 
         public virtual List<Shipment>? Shipments { get; set; }
 
-        public virtual List<OrderItem>? Orders { get; set; }
+        public virtual List<Order>? Orders { get; set; }
 
          public virtual List<Cart>? Carts { get; set; }
 
         public virtual List<Wishlist>? Wishlist { get; set; }
 
 
-        public List<Product>? Products { get; set; }
+        //public List<Product>? Products { get; set; }
 
     }
 }

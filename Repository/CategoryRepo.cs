@@ -2,10 +2,11 @@
 {
     public class CategoryRepo: GenericRepo<Category>, ICategoryRepo
     {
-        ITIContext context;
-        public CategoryRepo(ITIContext context) : base(context)
+        private readonly HandmadeContext handmadeContext;
+
+        public CategoryRepo(HandmadeContext handmadeContext) : base(handmadeContext)
         {
-            this.context = context;
+            this.handmadeContext = handmadeContext;
         }
     }
 }

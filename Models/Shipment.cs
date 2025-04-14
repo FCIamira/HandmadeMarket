@@ -1,6 +1,6 @@
 ﻿namespace HandmadeMarket.Models
 {
-    public class Class
+    public class Shipment
     {
     }
 }

@@ -1,4 +1,6 @@
 
+
+
 namespace HandmadeMarket
 {
     public class Program
@@ -13,6 +15,9 @@ namespace HandmadeMarket
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddDbContext<HandmadeContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("HandmadeMarketDB")));
 
             var app = builder.Build();
 

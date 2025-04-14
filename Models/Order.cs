@@ -18,7 +18,7 @@ namespace HandmadeMarket.Models
         //public Shipment Shipment { get; set; }
         //public int ShipmentId { get; set; }
 
-        public List<Order_Item> Order_Items { get; set; }
+        public List<OrderItem> Order_Items { get; set; }
 
     }
 }

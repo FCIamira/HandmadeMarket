@@ -1,27 +1,27 @@
 ﻿
 namespace HandmadeMarket.Context
 {
-    public class HandmadeContext : DbContext
-    {
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<Order_Item> Order_Items { get; set; }
+//    public class HandmadeContext : DbContext
+//    {
+//        public DbSet<Order> Orders { get; set; }
+//        public DbSet<OrderItem> Order_Items { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            // Composite key for Order_Item
-            modelBuilder.Entity<Order_Item>()
-                .HasKey(oi => new { oi.OrderItemId, oi.OrderId });
+//        protected override void OnModelCreating(ModelBuilder modelBuilder)
+//        {
+//            // Composite key for Order_Item
+//            modelBuilder.Entity<OrderItem>()
+//                .HasKey(oi => new { oi.OrderItemId, oi.OrderId });
 
-            // one-to-many relationship between Order and Order_Item
-            modelBuilder.Entity<Order>()
-                  .HasMany(o => o.Order_Items)
-                  .WithOne(oi => oi.Order);
+//            // one-to-many relationship between Order and Order_Item
+//            modelBuilder.Entity<Order>()
+//                  .HasMany(o => o.Order_Items)
+//                  .WithOne(oi => oi.Order);
                
-        }
+//        }
 
-        public HandmadeContext(DbContextOptions<HandmadeContext> options)
-            : base(options)
-        {
-        }
-    }
+//        public HandmadeContext(DbContextOptions<HandmadeContext> options)
+//            : base(options)
+//        {
+//        }
+ // }
 }

@@ -17,5 +17,7 @@ namespace HandmadeMarket.Models
         public int sellerId { get; set; }
         public virtual Seller? seller { get; set; }
         public virtual Category? category { get; set; }
+
+       // public List<Customer> customers { get; set; }   
     }
 }

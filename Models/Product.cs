@@ -4,20 +4,19 @@ namespace HandmadeMarket.Models
 {
     public class Product
     {
-        public int productId { get; set; }
+        public int ProductId { get; set; }
         public string? SKU { get; set; }
-        public string? description { get; set; }
-        public string? name { get; set; }
-        public decimal price { get; set; }
-        public int stock { get; set; }
-        public string? image { get; set; }
-        [ForeignKey("category")]
+        public string? Description { get; set; }
+        public string? Name { get; set; }
+        public decimal Price { get; set; }
+        public int Stock { get; set; }
+        public string? Image { get; set; }
+        [ForeignKey("Category")]
         public int categoryId { get; set; }
-        [ForeignKey("seller")]
+        [ForeignKey("Seller")]
         public int sellerId { get; set; }
-        public virtual Seller? seller { get; set; }
-        public virtual Category? category { get; set; }
+        public virtual Seller? Seller { get; set; }
+        public virtual Category? Category { get; set; }
 
-       // public List<Customer> customers { get; set; }   
     }
 }

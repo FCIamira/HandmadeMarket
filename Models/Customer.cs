@@ -16,11 +16,10 @@
 
          public virtual List<Cart>? Carts { get; set; }
 
-        //public virtual List<Wishlist>? Wishlist { get; set; }
+        public virtual List<Wishlist>? Wishlist { get; set; }
 
-       // public virtual List<Payment>? Payment { get; set; }
 
-       // public List<Product> Products { get; set; }
+        public List<Product>? Products { get; set; }
 
     }
 }

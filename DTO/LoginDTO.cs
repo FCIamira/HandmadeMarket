@@ -1,4 +1,4 @@
-﻿namespace HandmadeMarket.Models
+﻿namespace HandmadeMarket.DTO
 {
     public class LoginDTO
     {

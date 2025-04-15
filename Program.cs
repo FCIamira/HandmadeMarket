@@ -17,6 +17,10 @@ namespace HandmadeMarket
 
             // Add services to the container.
 
+            builder.Services.AddScoped<IProductIRepo, ProductRepo>();
+            builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+            builder.Services.AddScoped<ISellerRepo, SellerRepo>();
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

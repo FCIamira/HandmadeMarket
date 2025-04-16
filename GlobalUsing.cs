@@ -8,4 +8,3 @@ global using HandmadeMarket.Interfaces;
 global using HandmadeMarket.Repository;
 global using System.ComponentModel.DataAnnotations;
 global using HandmadeMarket.Context;
-

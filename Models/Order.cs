@@ -4,8 +4,11 @@ namespace HandmadeMarket.Models
     public class Order
     {
         [Key]
+     
         public int OrderId { get; set; }
         public DateTime Order_Date { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+
         public decimal Total_Price { get; set; }
 
         [ForeignKey("Customer")]

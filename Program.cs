@@ -28,6 +28,9 @@ namespace HandmadeMarket
 
             builder.Services.AddDbContext<HandmadeContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            // dependency injection
+            builder.Services.AddScoped<IOrderRepo,OrderRepo>();
+            builder.Services.AddScoped<IProductRepo, ProductRepo>();
 
             builder.Services.AddCors(options =>
             {

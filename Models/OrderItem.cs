@@ -2,12 +2,15 @@
 {
     public class OrderItem
     {
-       //[Key]
-        public int OrderItemId { get; set; } // Part of composite PK
+       [Key]
+      
+        public int OrderItemId { get; set; } 
         [ForeignKey("Order")]
-        public int OrderId { get; set; }    // Part of composite PK
+        public int OrderId { get; set; }    
       
         public int Quantity { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+
         public decimal Price { get; set; }
        
         [ForeignKey("Product")]

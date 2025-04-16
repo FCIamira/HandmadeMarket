@@ -44,14 +44,15 @@ namespace HandmadeMarket.Context
             });
 
             // تكوين الكيانات الخاصة بك
-            modelBuilder.Entity<OrderItem>()
-                .HasKey(oi => new { oi.OrderItemId, oi.OrderId });
+            //modelBuilder.Entity<OrderItem>()
+            //    .HasKey(oi => new { oi.OrderItemId, oi.OrderId });
 
-            modelBuilder.Entity<Cart>()
-                .HasKey(c => new { c.CustomerId, c.Id });
+            //modelBuilder.Entity<Cart>()
 
-            modelBuilder.Entity<Wishlist>()
-                .HasKey(w => new { w.CustomerId, w.Id });
+            //    .HasKey(c => new { c.CustomerId, c.Id });
+
+            //modelBuilder.Entity<Wishlist>()
+            //    .HasKey(w => new { w.CustomerId, w.Id });
 
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.Order_Items)

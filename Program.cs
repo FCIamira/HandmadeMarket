@@ -32,6 +32,7 @@ namespace HandmadeMarket
             // dependency injection
             builder.Services.AddScoped<IOrderRepo,OrderRepo>();
             builder.Services.AddScoped<IProductRepo, ProductRepo>();
+            builder.Services.AddScoped<IOrderItemRepo, OrderItemRepo>();
 
             builder.Services.AddCors(options =>
             {

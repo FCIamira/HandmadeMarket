@@ -5,6 +5,7 @@
         [Key]
       
         public int Id { get; set; }
+
         [ForeignKey("Customer")]
         public int CustomerId { get; set; }
         [ForeignKey("Product")]

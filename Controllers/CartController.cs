@@ -59,11 +59,12 @@ namespace HandmadeMarket.Controllers
         ////////////////////////////////update
         
         [HttpPut("{id:int}")]
-        public IActionResult Update(int id,Cart cart) {
+        public IActionResult Update(int id,UpdateCartDTO cartFromReq) {
             Cart cart1 = cartRepo.GetById(id);
             if (cart1 != null)
             {
-                cartRepo.Update(id,cart);
+                cart1.Quantity = cartFromReq.Quantity;
+                cartRepo.Update(id,cart1);
                 cartRepo.Save();
                 return Content("Cart is updated sucessfully");
             }

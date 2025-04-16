@@ -25,7 +25,7 @@ namespace HandmadeMarket
             builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
             builder.Services.AddScoped<ISellerRepo, SellerRepo>();
             builder.Services.AddScoped<ICartRepo, CartRepo>();
-
+            builder.Services.AddScoped<IWishList,WishListRepo>();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

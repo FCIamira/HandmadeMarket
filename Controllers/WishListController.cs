@@ -27,33 +27,27 @@ namespace HandmadeMarket.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            Wishlist wishListFromDB = wishListRepo.GetById(id);
+            WishListDTO wishListFromDB = wishListRepo.GetWishListById(id);
 
             if (wishListFromDB == null)
                 return NotFound("Wishlist item not found");
 
-            if (wishListFromDB.Product == null)
-                return BadRequest("Product data is missing in the wishlist item");
+          
 
-            WishListDTO dto = new WishListDTO
-            {
-                Id = wishListFromDB.Id,
-                ProductDescription = wishListFromDB.Product.Description,
-                ProductName = wishListFromDB.Product.Name,
-                ProductId = wishListFromDB.Product.ProductId,
-                Image = wishListFromDB.Product.Image,
-            };
-
-            return Ok(dto);
+            return Ok(wishListFromDB);
         }
-
+      
+        /// /////////////////////////////not completed  add
+   
         //[HttpPost]
-        //public IActionResult Add(Cart cart)
+        //public IActionResult Add(WishListDTO wishList)
         //{
+        //    Wishlist wishlist=new Wishlist();
+
         //    if (ModelState.IsValid)
         //    {
-        //        cartRepo.Add(cart);
-        //        cartRepo.Save();
+        //        wishListRepo.Add(wishList);
+        //        wishListRepo.Save();
         //        return Created();
         //    }
         //    return BadRequest();
@@ -73,20 +67,5 @@ namespace HandmadeMarket.Controllers
             return NotFound("Invalid Id");
         }
 
-        //////////////////////////////////update
-
-        //[HttpPut("{id:int}")]
-        //public IActionResult Update(int id, Cart cart)
-        //{
-        //    Cart cart1 = cartRepo.GetById(id);
-        //    if (cart1 != null)
-        //    {
-        //        cartRepo.Update(id, cart);
-        //        cartRepo.Save();
-        //        return Content("Cart is updated sucessfully");
-        //    }
-        //    return NotFound("Invalid Id");
-
-        //}
     }
 }

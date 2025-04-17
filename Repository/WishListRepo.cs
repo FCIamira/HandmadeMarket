@@ -26,6 +26,7 @@
         {
             WishListDTO wishList = handmadeContext.Wishlists
                 .Where(w => w.Id == id)
+                .Include(c=>c.Product)
                 .Select(w => new WishListDTO
                 {
                     Id = w.Id,

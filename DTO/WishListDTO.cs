@@ -8,5 +8,6 @@
         public string ?ProductDescription { get; set; }
         public decimal ProductPrice { get; set; }
         public string? Image { get; set; }
+
     }
 }

@@ -16,33 +16,38 @@ namespace HandmadeMarket.Controllers
             this.productRepo = productRepo;
         }
 
+        #region Get All
         [HttpGet]
-        public IActionResult GetAll() 
-        { 
-          IEnumerable<Order> orders = orderRepo.GetAll();
+        public IActionResult GetAll()
+        {
+            IEnumerable<Order> orders = orderRepo.GetAll();
             List<FlatOrder_OrderItems> orderDTO = orders.SelectMany
                 (order => order.Order_Items.Select(oi => new FlatOrder_OrderItems
-            {
+                {
 
-                Order_Date = order.Order_Date,
-                Total_Price = orderRepo.CalcTotalPrice(oi.Price,oi.Quantity),
-                CustomerName = order.Customer.FirstName,
-                PricePerItem = oi.Price,
-                Quantity = oi.Quantity,
-                ProductName = oi.Product.Name,
-            })).ToList();
+                    Order_Date = order.Order_Date,
+                    Total_Price = orderRepo.CalcTotalPrice(oi.Price, oi.Quantity),
+                    CustomerName = order.Customer.FirstName,
+                    PricePerItem = oi.Price,
+                    Quantity = oi.Quantity,
+                    ProductName = oi.Product.Name,
+                })).ToList();
 
             return Ok(orderDTO);
         }
+        #endregion
 
+        #region Get By Id
         [HttpGet("{id}")]
-        public IActionResult GetById(int id) { 
-        Order order = orderRepo.GetById(id);
+        public IActionResult GetById(int id)
+        {
+            Order order = orderRepo.GetById(id);
             if (order == null)
             {
                 return NotFound();
             }
-            else {
+            else
+            {
 
                 FlatOrder_OrderItems FlatOrder = order.Order_Items.Select(oi => new FlatOrder_OrderItems
                 {
@@ -57,10 +62,10 @@ namespace HandmadeMarket.Controllers
 
                 return Ok(FlatOrder);
             }
-          
-           
-        }
 
+
+        } 
+        #endregion
 
         #region Create Order
         [HttpPost]
@@ -164,6 +169,7 @@ namespace HandmadeMarket.Controllers
 
 
         #endregion
+
         #region Delete Order
         [HttpDelete("{id}")]
         public IActionResult DeleteOrder(int id)

@@ -24,6 +24,7 @@ namespace HandmadeMarket
             builder.Services.AddScoped<IShipmentRepo, ShipmentRepo>();
             builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
 
+            builder.Services.AddScoped<IWishList,WishListRepo>();
             builder.Services.AddControllers();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -35,6 +36,7 @@ namespace HandmadeMarket
             // dependency injection
             builder.Services.AddScoped<IOrderRepo,OrderRepo>();
             builder.Services.AddScoped<IProductRepo, ProductRepo>();
+            builder.Services.AddScoped<IOrderItemRepo, OrderItemRepo>();
 
             builder.Services.AddCors(options =>
             {

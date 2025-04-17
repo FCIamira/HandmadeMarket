@@ -19,12 +19,12 @@ namespace HandmadeMarket.Repository
             _dbSet.Add(obj);
         }
 
-        public IEnumerable<T> GetAll()
+        public virtual IEnumerable<T> GetAll()
         {
             return _dbSet;
         }
 
-        public T GetById(int Id)
+        public virtual T GetById(int Id)
         {
             return _dbSet.Find(Id);
         }

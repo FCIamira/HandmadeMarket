@@ -12,6 +12,7 @@ namespace HandmadeMarket.Repository
             this.context = context;
         }
 
+        
         public void AddProduct(AddProductDTO product)
         {
             Product productDTO = new Product
@@ -55,19 +56,10 @@ namespace HandmadeMarket.Repository
 
         }
 
-        public IQueryable<ProductDTO> GetAllProduct()
+        public IEnumerable<Product> GetAll()
         {
-            IQueryable<ProductDTO> products = context.Products
-                .Select(p => new ProductDTO
-                {
-                    ProductId = p.ProductId,
-                    Description = p.Description,
-                    Name = p.Name,
-                    Price = p.Price,
-                    Stock = p.Stock,
-                    Image = p.Image
-                });
-            return products;
+
+            return context.Products.Include(p => p.Ratings);
 
         }
 
@@ -102,5 +94,7 @@ namespace HandmadeMarket.Repository
                 }).FirstOrDefault();
             return productDTO;
         }
+
+       
     }
 }

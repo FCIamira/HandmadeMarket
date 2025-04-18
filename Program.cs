@@ -23,7 +23,7 @@ namespace HandmadeMarket
             builder.Services.AddScoped<ICartRepo, CartRepo>();
             builder.Services.AddScoped<IShipmentRepo, ShipmentRepo>();
             builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
-
+            builder.Services.AddScoped<IRatingRepo, RatingRepo>();
             builder.Services.AddScoped<IWishList,WishListRepo>();
             builder.Services.AddControllers();
 

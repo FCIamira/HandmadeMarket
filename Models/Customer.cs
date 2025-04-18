@@ -18,6 +18,7 @@
 
         public virtual List<Wishlist>? Wishlist { get; set; }
 
+        public virtual ICollection<Rating>? Ratings { get; set; }
 
         //public List<Product>? Products { get; set; }
 

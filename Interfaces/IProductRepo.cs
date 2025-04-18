@@ -2,7 +2,7 @@
 {
     public interface IProductRepo: IGenericRepo<Product>
     {
-        IQueryable<ProductDTO> GetAllProduct();
+      //  IEnumerable<Product> GetAllProduct();
         ProductDTO GetProductById(int id);
         ProductDTO GetProductByName(string name);
         void AddProduct(AddProductDTO product);

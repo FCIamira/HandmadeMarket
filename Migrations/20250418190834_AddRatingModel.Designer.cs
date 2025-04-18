@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HandmadeMarket.Migrations
 {
     [DbContext(typeof(HandmadeContext))]
-    [Migration("20250416162154_init")]
-    partial class init
+    [Migration("20250418190834_AddRatingModel")]
+    partial class AddRatingModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -266,6 +266,35 @@ namespace HandmadeMarket.Migrations
                     b.HasIndex("sellerId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("HandmadeMarket.Models.Rating", b =>
+                {
+                    b.Property<int>("RatingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RatingId"));
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.HasKey("RatingId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Rating");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Seller", b =>
@@ -566,6 +595,25 @@ namespace HandmadeMarket.Migrations
                     b.Navigation("Seller");
                 });
 
+            modelBuilder.Entity("HandmadeMarket.Models.Rating", b =>
+                {
+                    b.HasOne("HandmadeMarket.Models.Customer", "Customer")
+                        .WithMany("Ratings")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HandmadeMarket.Models.Product", "Product")
+                        .WithMany("Ratings")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("HandmadeMarket.Models.Shipment", b =>
                 {
                     b.HasOne("HandmadeMarket.Models.Customer", "Customer")
@@ -658,6 +706,8 @@ namespace HandmadeMarket.Migrations
 
                     b.Navigation("Orders");
 
+                    b.Navigation("Ratings");
+
                     b.Navigation("Shipments");
 
                     b.Navigation("Wishlist");
@@ -666,6 +716,11 @@ namespace HandmadeMarket.Migrations
             modelBuilder.Entity("HandmadeMarket.Models.Order", b =>
                 {
                     b.Navigation("Order_Items");
+                });
+
+            modelBuilder.Entity("HandmadeMarket.Models.Product", b =>
+                {
+                    b.Navigation("Ratings");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Seller", b =>

@@ -265,6 +265,35 @@ namespace HandmadeMarket.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("HandmadeMarket.Models.Rating", b =>
+                {
+                    b.Property<int>("RatingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RatingId"));
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.HasKey("RatingId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Ratings");
+                });
+
             modelBuilder.Entity("HandmadeMarket.Models.Seller", b =>
                 {
                     b.Property<int>("sellerId")
@@ -492,13 +521,13 @@ namespace HandmadeMarket.Migrations
                     b.HasOne("HandmadeMarket.Models.Customer", "Customer")
                         .WithMany("Carts")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HandmadeMarket.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
@@ -511,13 +540,13 @@ namespace HandmadeMarket.Migrations
                     b.HasOne("HandmadeMarket.Models.Customer", "Customer")
                         .WithMany("Orders")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HandmadeMarket.Models.Shipment", "Shipment")
                         .WithMany("Orders")
                         .HasForeignKey("ShipmentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
@@ -530,13 +559,13 @@ namespace HandmadeMarket.Migrations
                     b.HasOne("HandmadeMarket.Models.Order", "Order")
                         .WithMany("Order_Items")
                         .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HandmadeMarket.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Order");
@@ -549,13 +578,13 @@ namespace HandmadeMarket.Migrations
                     b.HasOne("HandmadeMarket.Models.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("categoryId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HandmadeMarket.Models.Seller", "Seller")
                         .WithMany("Products")
                         .HasForeignKey("sellerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
@@ -563,12 +592,31 @@ namespace HandmadeMarket.Migrations
                     b.Navigation("Seller");
                 });
 
+            modelBuilder.Entity("HandmadeMarket.Models.Rating", b =>
+                {
+                    b.HasOne("HandmadeMarket.Models.Customer", "Customer")
+                        .WithMany("Ratings")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HandmadeMarket.Models.Product", "Product")
+                        .WithMany("Ratings")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("HandmadeMarket.Models.Shipment", b =>
                 {
                     b.HasOne("HandmadeMarket.Models.Customer", "Customer")
                         .WithMany("Shipments")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
@@ -579,13 +627,13 @@ namespace HandmadeMarket.Migrations
                     b.HasOne("HandmadeMarket.Models.Customer", "Customer")
                         .WithMany("Wishlist")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HandmadeMarket.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
@@ -598,7 +646,7 @@ namespace HandmadeMarket.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -607,7 +655,7 @@ namespace HandmadeMarket.Migrations
                     b.HasOne("HandmadeMarket.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -616,7 +664,7 @@ namespace HandmadeMarket.Migrations
                     b.HasOne("HandmadeMarket.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -625,13 +673,13 @@ namespace HandmadeMarket.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HandmadeMarket.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -640,7 +688,7 @@ namespace HandmadeMarket.Migrations
                     b.HasOne("HandmadeMarket.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -655,6 +703,8 @@ namespace HandmadeMarket.Migrations
 
                     b.Navigation("Orders");
 
+                    b.Navigation("Ratings");
+
                     b.Navigation("Shipments");
 
                     b.Navigation("Wishlist");
@@ -663,6 +713,11 @@ namespace HandmadeMarket.Migrations
             modelBuilder.Entity("HandmadeMarket.Models.Order", b =>
                 {
                     b.Navigation("Order_Items");
+                });
+
+            modelBuilder.Entity("HandmadeMarket.Models.Product", b =>
+                {
+                    b.Navigation("Ratings");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Seller", b =>

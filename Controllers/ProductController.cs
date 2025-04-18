@@ -16,12 +16,22 @@ namespace HandmadeMarket.Controllers
         [HttpGet]
         public IActionResult GetAllProduct()
         {
-            var products = productRepo.GetAllProduct();
+           IEnumerable<Product> products = productRepo.GetAll();
+            List<ProductDTO> productDTO = products.Select(products => new ProductDTO
+            {
+                ProductId = products.ProductId,
+                Name = products.Name,
+                Description = products.Description,
+                Price = products.Price,
+                Stock = products.Stock
+
+            }).ToList();
+
             if (products == null)
             {
                 return NotFound("Product not found");
             }
-            return Ok(products);
+            return Ok(productDTO);
         }
         [HttpGet("{id}")]
         public IActionResult GetProductById(int id)

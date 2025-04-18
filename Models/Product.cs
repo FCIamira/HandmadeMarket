@@ -17,8 +17,10 @@ namespace HandmadeMarket.Models
         public int categoryId { get; set; }
         [ForeignKey("Seller")]
         public int sellerId { get; set; }
+       
         public virtual Seller? Seller { get; set; }
         public virtual Category? Category { get; set; }
+        public virtual ICollection<Rating>? Ratings { get; set; }
 
     }
 }

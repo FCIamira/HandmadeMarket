@@ -13,6 +13,8 @@ namespace HandmadeMarket.Context
         }
 
         // DbSets يجب أن تكون public
+        public DbSet<Rating> Ratings { get; set; }
+
         public DbSet<Shipment> Shipments { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }

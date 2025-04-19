@@ -13,18 +13,46 @@ namespace HandmadeMarket.Controllers
         {
             this.productRepo = productRepo;
         }
+        #region GetAll
         [HttpGet]
         public IActionResult GetAllProduct()
         {
-           IEnumerable<Product> products = productRepo.GetAll();
+            IEnumerable<Product> products = productRepo.GetAll();
             List<ProductDTO> productDTO = products.Select(products => new ProductDTO
             {
                 ProductId = products.ProductId,
                 Name = products.Name,
                 Description = products.Description,
                 Price = products.Price,
-                Stock = products.Stock
+                Stock = products.Stock,
+                PriceAfterSale = products.PriceAfterSale>0 ? products.PriceAfterSale:products.Price,
+                SalePercentage = products.SalePercentage>0 ? products.SalePercentage:0,
 
+            }).ToList();
+            
+
+            if (products == null)
+            {
+                return NotFound("Product not found");
+            }
+            return Ok(productDTO);
+        }
+        #endregion
+
+        #region GetAll Products that have sale
+        [HttpGet("sale")]
+        public IActionResult GetAllProductsHaveSale()
+        {
+            IEnumerable<Product> products = productRepo.GetProductsHaveSale();
+            List<ProductDTO> productDTO = products.Select(products => new ProductDTO
+            {
+                ProductId = products.ProductId,
+                Name = products.Name,
+                Description = products.Description,
+                Price = products.Price,
+                Stock = products.Stock,
+                PriceAfterSale = products.PriceAfterSale,
+                SalePercentage = products.SalePercentage,
             }).ToList();
 
             if (products == null)
@@ -33,6 +61,10 @@ namespace HandmadeMarket.Controllers
             }
             return Ok(productDTO);
         }
+
+        #endregion
+
+        #region GetProductById
         [HttpGet("{id}")]
         public IActionResult GetProductById(int id)
         {
@@ -43,6 +75,11 @@ namespace HandmadeMarket.Controllers
             }
             return Ok(product);
         }
+
+
+        #endregion
+
+        #region GetProductByName
         [HttpGet("name/{name:alpha}")]
         public IActionResult GetProductByName(string name)
         {
@@ -53,18 +90,40 @@ namespace HandmadeMarket.Controllers
             }
             return Ok(product);
         }
+        #endregion
+
+        #region CreateProduct
         [HttpPost]
         public IActionResult CreateProduct(AddProductDTO productDTO)
         {
+            Product product = new Product()
+            {
+
+                Description = productDTO.Description,
+                Name = productDTO.Name,
+                Price = productDTO.Price,
+                Stock = productDTO.Stock,
+                Image = productDTO.Image,
+                categoryId = productDTO.categoryId,
+                sellerId = productDTO.sellerId,
+                HasSale = productDTO.HasSale,
+                SalePercentage = productDTO.SalePercentage,
+                PriceAfterSale = productRepo.CalcPriceAfterSale(productDTO.Price, productDTO.SalePercentage)
+            };
             if (ModelState.IsValid)
             {
-                productRepo.AddProduct(productDTO);
+                productRepo.Add(product);
                 productRepo.Save();
-                return CreatedAtAction("GetProductById", new { id = productDTO.ProductId }, productDTO);
+                Product product1 = productRepo.GetById(product.ProductId);
+                return CreatedAtAction("GetProductById", new { id = product1.ProductId }, productDTO);
             }
-            return BadRequest(ModelState);
+            else
+                return BadRequest(ModelState);
 
         }
+        #endregion
+
+        #region Edit product
         [HttpPut("{id}")]
         public IActionResult EditProduct(int id, AddProductDTO productDTO)
         {
@@ -81,6 +140,10 @@ namespace HandmadeMarket.Controllers
             }
             return BadRequest(ModelState);
         }
+
+        #endregion
+
+        #region Delete
         [HttpDelete("{id:int}")]
         public IActionResult DeleteProduct(int id)
         {
@@ -92,6 +155,8 @@ namespace HandmadeMarket.Controllers
             productRepo.DeleteProduct(id);
             productRepo.Save();
             return NoContent();
-        }
+        } 
+        #endregion
+
     }
 }

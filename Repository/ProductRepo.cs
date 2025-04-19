@@ -12,22 +12,28 @@ namespace HandmadeMarket.Repository
             this.context = context;
         }
 
-        
-        public void AddProduct(AddProductDTO product)
+        public decimal CalcPriceAfterSale(decimal price, decimal salePercentage)
         {
-            Product productDTO = new Product
-            {
-                sellerId = product.sellerId,
-                categoryId = product.categoryId,
-                ProductId = product.ProductId,
-                Description = product.Description,
-                Name = product.Name,
-                Price = product.Price,
-                Stock = product.Stock,
-                Image = product.Image
-            };
-            context.Add(productDTO);
+           decimal priceAfterSale = price - (price * salePercentage);
+            return priceAfterSale;
         }
+
+
+        //public void AddProduct(AddProductDTO product)
+        //{
+        //    Product productDTO = new Product
+        //    {
+        //        sellerId = product.sellerId,
+        //        categoryId = product.categoryId,
+        //        ProductId = product.ProductId,
+        //        Description = product.Description,
+        //        Name = product.Name,
+        //        Price = product.Price,
+        //        Stock = product.Stock,
+        //        Image = product.Image
+        //    };
+        //    context.Add(productDTO);
+        //}
 
         public void DeleteProduct(int id)
         {
@@ -95,6 +101,13 @@ namespace HandmadeMarket.Repository
             return productDTO;
         }
 
-       
+        public IEnumerable<Product> GetProductsHaveSale()
+        {
+            IEnumerable<Product> products = context.Products
+                .Include(p => p.Ratings)
+                .Where(s => s.HasSale);
+            return products;
+
+        }
     }
 }

@@ -4,6 +4,7 @@ using HandmadeMarket.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HandmadeMarket.Migrations
 {
     [DbContext(typeof(HandmadeContext))]
-    partial class HandmadeContextModelSnapshot : ModelSnapshot
+    [Migration("20250419140728_RenameColumnInProductTable")]
+    partial class RenameColumnInProductTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,7 +113,7 @@ namespace HandmadeMarket.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Carts", (string)null);
+                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Category", b =>
@@ -126,7 +129,7 @@ namespace HandmadeMarket.Migrations
 
                     b.HasKey("categoryId");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Customer", b =>
@@ -163,7 +166,7 @@ namespace HandmadeMarket.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Order", b =>
@@ -192,7 +195,7 @@ namespace HandmadeMarket.Migrations
 
                     b.HasIndex("ShipmentId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.OrderItem", b =>
@@ -221,7 +224,7 @@ namespace HandmadeMarket.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Items", (string)null);
+                    b.ToTable("Items");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Product", b =>
@@ -271,7 +274,7 @@ namespace HandmadeMarket.Migrations
 
                     b.HasIndex("sellerId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Rating", b =>
@@ -300,7 +303,7 @@ namespace HandmadeMarket.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Ratings", (string)null);
+                    b.ToTable("Ratings");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Seller", b =>
@@ -325,7 +328,7 @@ namespace HandmadeMarket.Migrations
 
                     b.HasKey("sellerId");
 
-                    b.ToTable("Sellers", (string)null);
+                    b.ToTable("Sellers");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Shipment", b =>
@@ -366,7 +369,7 @@ namespace HandmadeMarket.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Shipments", (string)null);
+                    b.ToTable("Shipments");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Wishlist", b =>
@@ -389,7 +392,7 @@ namespace HandmadeMarket.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Wishlists", (string)null);
+                    b.ToTable("Wishlists");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

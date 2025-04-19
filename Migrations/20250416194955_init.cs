@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace HandmadeMarket.Migrations
 {
-   
+
     public partial class init : Migration
     {
-        
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -464,7 +464,7 @@ namespace HandmadeMarket.Migrations
                 column: "ProductId");
         }
 
-       
+
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

@@ -2,7 +2,7 @@
 {
     public class AddProductDTO
     {
-        public int ProductId { get; set; }
+      
 
         public string? Description { get; set; }
         public string? Name { get; set; }
@@ -11,5 +11,8 @@
         public string? Image { get; set; }
         public int categoryId { get; set; }
         public int sellerId { get; set; }
+        public bool HasSale { get; set; }
+        public decimal SalePercentage { get; set; }
+
     }
 }

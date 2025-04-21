@@ -1,5 +1,6 @@
 ﻿
 using HandmadeMarket.Models;
+using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace HandmadeMarket.Repository
@@ -108,6 +109,26 @@ namespace HandmadeMarket.Repository
                 .Where(s => s.HasSale);
             return products;
 
+        }
+  
+       public List<ProductDTO> GetProductsByRanges(decimal min, decimal max)
+        {
+            List<Product?> products = context.Products.Where(p=>p.Price <= max && p.Price >= min).ToList();
+            List<ProductDTO> result = new List<ProductDTO>();
+            foreach (var product in products)
+            {
+                ProductDTO dto = new ProductDTO
+                {
+                    ProductId= product.ProductId,
+                    Price = product.Price,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Image = product.Image,
+                    Stock = product.Stock
+                };
+                result.Add(dto);
+            }
+            return result;
         }
     }
 }

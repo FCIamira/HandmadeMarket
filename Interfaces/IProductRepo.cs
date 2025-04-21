@@ -10,5 +10,7 @@
         ProductDTO GetProductById(int id);
         void EditProduct(int id, AddProductDTO product);
         void DeleteProduct(int id);
+
+        List<ProductDTO> GetProductsByRanges(decimal min, decimal max);
     }
 }

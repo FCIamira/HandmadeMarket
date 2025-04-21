@@ -155,8 +155,16 @@ namespace HandmadeMarket.Controllers
             productRepo.DeleteProduct(id);
             productRepo.Save();
             return NoContent();
-        } 
+        }
         #endregion
+
+
+        [HttpGet("p")]
+        public IActionResult FilterProductsByPrice(decimal min, decimal max) { 
+        List<ProductDTO> products=productRepo.GetProductsByRanges(min, max);
+            return Ok(products);
+        
+        }
 
     }
 }

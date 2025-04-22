@@ -16,48 +16,120 @@ namespace HandmadeMarket.Controllers
         [HttpGet]
         public IActionResult GetAllSellersWithProducts()
         {
-            IQueryable<SellerWithProductsDTO> sellers= sellerRepo.GetAllSellersWithProducts();
-            if(ModelState.IsValid)
+            var sellers = sellerRepo.GetAllSellersWithProducts();
+
+            if (sellers == null || !sellers.Any())
             {
-                if(sellers !=null )
-                    return Ok(sellers);
-                else
-                    return NotFound("No sellers found");
+                return NotFound("No sellers found");
             }
-            return BadRequest(ModelState);
+
+            var sellerDtos = sellers.Select(s => new SellerWithProductsDTO
+            {
+                sellerId = s.sellerId,
+                storeName = s.storeName,
+                email = s.email,
+                phoneNumber = s.phoneNumber,
+                createdAt = s.createdAt,
+                Products = s.Products?.Select(p => new ProductDTO
+                {
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price
+                }).ToList() ?? new List<ProductDTO>()
+            }).ToList();
+
+            return Ok(sellerDtos);
         }
+
         [HttpGet("{id:int}")]
         public IActionResult GetSellerById(int id)
         {
-            SellerWithProductsDTO seller = sellerRepo.GetSellerWithProductsById(id);
-            if(ModelState.IsValid)
+            Seller seller = sellerRepo.GetById(id);
+            if (seller == null)
             {
-                if(seller != null)
-                    return Ok(seller);
-                else
-                    return NotFound("Seller not found");
+                return NotFound("Seller not found");
             }
-            return BadRequest(ModelState);
-        }
+            else
+            {
+                SellerWithProductsDTO sellerWithProductsDTO = new SellerWithProductsDTO
+                {
+                    sellerId = id,
+                    storeName = seller.storeName,
+                    email = seller.email,
+                    phoneNumber = seller.phoneNumber,
+                    createdAt = seller.createdAt,
+                    Products = seller.Products?.Select(p => new ProductDTO
+                    {
+                        Name = p.Name,
+                        Description = p.Description,
+                        Price = p.Price
+                    }).ToList() ?? new List<ProductDTO>()
+                };
+                return Ok(sellerWithProductsDTO);
+            }
+        } 
         [HttpGet("{storeName:alpha}")]
         public IActionResult GetSellerByStoreName(string storeName)
         {
-            SellerWithProductsDTO seller = sellerRepo.GetSellerWithProductsByStoreName(storeName);
-            if (ModelState.IsValid)
+            Seller seller = sellerRepo.GetSellerWithProductsByStoreName(storeName);
+            if (seller == null)
             {
-                if (seller != null)
-                    return Ok(seller);
-                else
-                    return NotFound("Seller not found");
+                return NotFound("Seller not found");
             }
-            return BadRequest(ModelState);
+            else
+            {
+                SellerWithProductsDTO sellerDTO = new SellerWithProductsDTO
+                {
+                    sellerId = seller.sellerId,
+                    storeName = seller.storeName,
+                    email = seller.email,
+                    phoneNumber = seller.phoneNumber,
+                    Products = seller.Products?.Select(p => new ProductDTO
+                    {
+                        Name = p.Name,
+                        Description = p.Description,
+                        Price = p.Price
+                    }).ToList() ?? new List<ProductDTO>()
+                };
+                return Ok(sellerDTO);
+            }
         }
+        [HttpGet("product/{id:int}")]
+        public IActionResult GetSellerByProductId(int id)
+        {
+            Seller seller = sellerRepo.GetSellerByProductId(id);
+
+            if (seller == null)
+            {
+                return NotFound("Seller not found");
+            }
+            else
+            {
+                SellerDTO sellerDTO = new SellerDTO
+                {
+                    sellerId = seller.sellerId,
+                    storeName = seller.storeName,
+                    email = seller.email,
+                    phoneNumber = seller.phoneNumber
+                };
+                return Ok(sellerDTO);
+
+            }
+         }
         [HttpPost]
         public IActionResult AddSeller(SellerDTO sellerDTO)
         {
+            Seller seller = new Seller
+            {
+                sellerId = sellerDTO.sellerId,
+                storeName = sellerDTO.storeName,
+                email = sellerDTO.email,
+                phoneNumber = sellerDTO.phoneNumber,
+                createdAt = DateTime.Now
+            };
             if (ModelState.IsValid)
             {
-                sellerRepo.AddSeller(sellerDTO);
+                sellerRepo.Add(seller);
                 sellerRepo.Save();
                 return CreatedAtAction("GetSellerById", new { id = sellerDTO.sellerId }, sellerDTO);
             }
@@ -73,7 +145,12 @@ namespace HandmadeMarket.Controllers
                 {
                     return NotFound("Seller not found");
                 }
-                sellerRepo.EditSeller(id, sellerDTO);
+
+                seller.storeName = sellerDTO.storeName;
+                seller.email = sellerDTO.email;
+                seller.phoneNumber = sellerDTO.phoneNumber;
+
+                sellerRepo.Update(id, seller);
                 sellerRepo.Save();
                 return Ok(seller);
             }

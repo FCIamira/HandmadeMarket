@@ -11,5 +11,6 @@
         public decimal? SalePercentage { get; set; }
         public decimal? PriceAfterSale { get; set; }
 
+
     }
 }

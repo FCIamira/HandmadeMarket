@@ -16,7 +16,7 @@ namespace HandmadeMarket
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-             
+
             builder.Services.AddScoped<IProductRepo, ProductRepo>();
             builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
             builder.Services.AddScoped<ISellerRepo, SellerRepo>();

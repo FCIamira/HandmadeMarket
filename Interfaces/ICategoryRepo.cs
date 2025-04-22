@@ -2,9 +2,8 @@
 {
     public interface ICategoryRepo: IGenericRepo<Category>
     {
-        public List<CategoryWithProductDTO> GetCategoryByName(string name);
-        public List<CategoryWithProductDTO> CategoryDTO();
-        public CategoryWithProductDTO GetCategoryDTOById(int id);
-        public void AddCategory(CategoryDTO categoryDto);
+        public Category GetCategoryByName(string name);
+        IEnumerable<Category> GetAllCategoriesWithProducts();
+        public Category GetCategoryDTOById(int id);
     }
 }

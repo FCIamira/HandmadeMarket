@@ -15,13 +15,32 @@ namespace HandmadeMarket.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            List<CategoryWithProductDTO> categories = categoryRepo.CategoryDTO();
-            if (categories == null)
+            IEnumerable<Category> categories = categoryRepo.GetAllCategoriesWithProducts();
+            if (categories == null || !categories.Any())
             {
-                return NotFound();
+                return NotFound("No categories found.");
             }
-            return Ok(categories);
+
+            var categoryDTOs = categories.Select(c => new CategoryWithProductDTO
+            {
+                categoryId = c.categoryId,
+                name = c.name,
+                Products = c.Products.Select(p => new ProductDTO
+                {
+                    Name = p.Name,
+                    Price = p.Price,
+                    Description = p.Description,
+                    ProductId = p.ProductId,
+                    Stock = p.Stock,
+                    Image = p.Image,
+                    PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
+                    SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
+                }).ToList() ?? new List<ProductDTO>()
+            }).ToList();
+
+            return Ok(categoryDTOs);
         }
+
         //[HttpGet("{id:int}")]
         //public IActionResult GetCatecoryById(int id)
         //{
@@ -35,29 +54,71 @@ namespace HandmadeMarket.Controllers
         [HttpGet("{id:int}")]
         public IActionResult GetById(int id)
         {
-            CategoryWithProductDTO category = categoryRepo.GetCategoryDTOById(id);
+            Category category = categoryRepo.GetCategoryDTOById(id);
             if (category == null)
             {
                 return NotFound();
             }
-            return Ok(category);
+            else
+            {
+                CategoryWithProductDTO categoryDTO = new CategoryWithProductDTO
+                {
+                    categoryId = category.categoryId,
+                    name = category.name,
+                    Products = category.Products.Select(p => new ProductDTO
+                    {
+                        Name = p.Name,
+                        Price = p.Price,
+                        Description = p.Description,
+                        ProductId = p.ProductId,
+                        Stock = p.Stock,
+                        Image = p.Image,
+                        PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
+                        SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
+                    }).ToList() ?? new List<ProductDTO>()
+                };
+                return Ok(categoryDTO);
+            }
         }
         [HttpGet("{CategoryName:alpha}")]
         public IActionResult GetCategoryByName(string CategoryName)
         {
-            List<CategoryWithProductDTO> category = categoryRepo.GetCategoryByName(CategoryName);
+            Category category = categoryRepo.GetCategoryByName(CategoryName);
             if (category == null)
             {
                 return NotFound();
             }
-            return Ok(category);
+            else
+            {
+                CategoryWithProductDTO categoryDTO = new CategoryWithProductDTO
+                {
+                    categoryId = category.categoryId,
+                    name = category.name,
+                    Products = category.Products.Select(p => new ProductDTO
+                    {
+                        Name = p.Name,
+                        Price = p.Price,
+                        Description = p.Description,
+                        ProductId = p.ProductId,
+                        Stock = p.Stock,
+                        Image = p.Image,
+                        PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
+                        SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
+                    }).ToList() ?? new List<ProductDTO>()
+                };
+                return Ok(categoryDTO);
+            }
         }
         [HttpPost]
         public IActionResult AddCategory(CategoryDTO categoryDto)
         {
+            Category category = new Category
+            {
+                name = categoryDto.name,
+            };
             if (ModelState.IsValid)
             {
-                categoryRepo.AddCategory(categoryDto);
+                categoryRepo.Add(category);
                 categoryRepo.Save();
 
                 return CreatedAtAction("GetById", new { id = categoryDto.categoryId }, categoryDto);

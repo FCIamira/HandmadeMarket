@@ -1,5 +1,7 @@
 ﻿
+using HandmadeMarket.DTO;
 using HandmadeMarket.Models;
+using Microsoft.EntityFrameworkCore;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace HandmadeMarket.Repository
@@ -108,6 +110,28 @@ namespace HandmadeMarket.Repository
                 .Where(s => s.HasSale);
             return products;
 
+        }
+
+        public async Task<IEnumerable<TopProductsDTO>> GetTopProductsByHighestNumberOfOrder()
+        {
+            return await context.Items
+                .Include(oi => oi.Product)
+                    .ThenInclude(p => p.Category)
+                .Include(oi => oi.Product)
+                    .ThenInclude(p => p.Seller)
+                .GroupBy(oi => oi.Product)
+                .Select(g => new TopProductsDTO
+                {
+                    ProductId = g.Key.ProductId,
+                    Name = g.Key.Name,
+                    Price = g.Key.Price,
+                    ImageUrl = g.Key.Image,
+                    OrderCount = g.Count(),
+                    TotalQuantity = g.Sum(oi => oi.Quantity)
+                })
+                .OrderByDescending(x => x.OrderCount)
+                .Take(10)
+                .ToListAsync();
         }
     }
 }

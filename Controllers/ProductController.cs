@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HandmadeMarket.DTO;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HandmadeMarket.Controllers
@@ -68,12 +69,28 @@ namespace HandmadeMarket.Controllers
         [HttpGet("{id}")]
         public IActionResult GetProductById(int id)
         {
-            ProductDTO product = productRepo.GetProductById(id);
+            Product product = productRepo.GetById(id);
             if (product == null)
             {
                 return NotFound("Product not found");
             }
-            return Ok(product);
+            else
+            {
+                ProductDTO productDTO = new ProductDTO
+                {
+                    ProductId = product.ProductId,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    Stock = product.Stock,
+                    Image = product.Image,
+                    PriceAfterSale = product.PriceAfterSale > 0 ? product.PriceAfterSale : product.Price,
+                    SalePercentage = product.SalePercentage > 0 ? product.SalePercentage : 0,
+                };
+
+                return Ok(productDTO);
+            }
+          
         }
 
 
@@ -83,12 +100,27 @@ namespace HandmadeMarket.Controllers
         [HttpGet("name/{name:alpha}")]
         public IActionResult GetProductByName(string name)
         {
-            ProductDTO product = productRepo.GetProductByName(name);
+            Product product = productRepo.GetProductByName(name);
             if (product == null)
             {
                 return NotFound("Product not found");
             }
-            return Ok(product);
+            else
+            {
+                ProductDTO productDTO = new ProductDTO
+                {
+                    ProductId = product.ProductId,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    Stock = product.Stock,
+                    Image = product.Image,
+                    PriceAfterSale = product.PriceAfterSale > 0 ? product.PriceAfterSale : product.Price,
+                    SalePercentage = product.SalePercentage > 0 ? product.SalePercentage : 0,
+                };
+                return Ok(productDTO);
+            }
+            
         }
         #endregion
 
@@ -125,38 +157,61 @@ namespace HandmadeMarket.Controllers
 
         #region Edit product
         [HttpPut("{id}")]
-        public IActionResult EditProduct(int id, AddProductDTO productDTO)
+        public IActionResult EditProduct(int id, Product product)
         {
-            ProductDTO product = productRepo.GetProductById(id);
-            if (product == null)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Product existingProduct = productRepo.GetById(id);
+            if (existingProduct == null)
             {
                 return NotFound("Product not found");
             }
-            else if (ModelState.IsValid)
-            {
-                productRepo.EditProduct(id, productDTO);
-                productRepo.Save();
-                return Ok(productDTO);
-            }
-            return BadRequest(ModelState);
+
+            existingProduct.Description = product.Description;
+            existingProduct.Name = product.Name;
+            existingProduct.Price = product.Price;
+            existingProduct.Stock = product.Stock;
+            existingProduct.Image = product.Image;
+            existingProduct.categoryId = product.categoryId;
+            existingProduct.sellerId = product.sellerId;
+
+            productRepo.Update(id, existingProduct);
+            productRepo.Save();
+
+            return Ok(existingProduct);
         }
+
 
         #endregion
 
-        #region Delete
+
+        #region delete product
+
         [HttpDelete("{id:int}")]
         public IActionResult DeleteProduct(int id)
         {
-            ProductDTO product = productRepo.GetProductById(id);
+            Product product = productRepo.GetById(id);
             if (product == null)
             {
                 return NotFound("Product not found");
             }
-            productRepo.DeleteProduct(id);
+            productRepo.Remove(id);
             productRepo.Save();
             return NoContent();
-        } 
+        }
         #endregion
 
+        #region get top products
+        [HttpGet("top-ordered-with-details")]
+        public async Task<ActionResult> GetTopOrderedProductsWithDetails()
+        {
+            
+            var topProducts = await productRepo.GetTopProductsByHighestNumberOfOrder();
+            return Ok(topProducts);
+        }
+        #endregion
     }
 }

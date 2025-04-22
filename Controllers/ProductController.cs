@@ -213,5 +213,14 @@ namespace HandmadeMarket.Controllers
             return Ok(topProducts);
         }
         #endregion
+
+
+        [HttpGet("p")]
+        public IActionResult FilterProductsByPrice(decimal min, decimal max) { 
+        List<ProductDTO> products=productRepo.GetProductsByRanges(min, max);
+            return Ok(products);
+        
+        }
+
     }
 }

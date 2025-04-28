@@ -66,6 +66,7 @@ namespace HandmadeMarket.Controllers
                         if (userRoles != null)
                         {
                             foreach (var role in userRoles)
+
                             {
                                 claim.Add(new Claim(ClaimTypes.Role, role));
                             }

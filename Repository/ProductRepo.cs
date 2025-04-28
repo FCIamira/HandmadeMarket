@@ -1,5 +1,8 @@
 ﻿
+using HandmadeMarket.DTO;
 using HandmadeMarket.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace HandmadeMarket.Repository
@@ -12,22 +15,28 @@ namespace HandmadeMarket.Repository
             this.context = context;
         }
 
-        
-        public void AddProduct(AddProductDTO product)
+        public decimal CalcPriceAfterSale(decimal price, decimal salePercentage)
         {
-            Product productDTO = new Product
-            {
-                sellerId = product.sellerId,
-                categoryId = product.categoryId,
-                ProductId = product.ProductId,
-                Description = product.Description,
-                Name = product.Name,
-                Price = product.Price,
-                Stock = product.Stock,
-                Image = product.Image
-            };
-            context.Add(productDTO);
+           decimal priceAfterSale = price - (price * salePercentage);
+            return priceAfterSale;
         }
+
+
+        //public void AddProduct(AddProductDTO product)
+        //{
+        //    Product productDTO = new Product
+        //    {
+        //        sellerId = product.sellerId,
+        //        categoryId = product.categoryId,
+        //        ProductId = product.ProductId,
+        //        Description = product.Description,
+        //        Name = product.Name,
+        //        Price = product.Price,
+        //        Stock = product.Stock,
+        //        Image = product.Image
+        //    };
+        //    context.Add(productDTO);
+        //}
 
         public void DeleteProduct(int id)
         {
@@ -79,22 +88,65 @@ namespace HandmadeMarket.Repository
             return productDTO;
         }
 
-        public ProductDTO GetProductByName(string name)
+        public Product GetProductByName(string name)
         {
-            ProductDTO? productDTO = context.Products
+            Product? product = context.Products
                 .Where(p => p.Name.ToLower().Contains(name.ToLower()))
-                .Select(p => new ProductDTO
-                {
-                    ProductId = p.ProductId,
-                    Description = p.Description,
-                    Name = p.Name,
-                    Price = p.Price,
-                    Stock = p.Stock,
-                    Image = p.Image
-                }).FirstOrDefault();
-            return productDTO;
+                .FirstOrDefault();
+            return product;
         }
 
-       
+        public IEnumerable<Product> GetProductsHaveSale()
+        {
+            IEnumerable<Product> products = context.Products
+                .Include(p => p.Ratings)
+                .Where(s => s.HasSale);
+            return products;
+
+        }
+
+
+        public async Task<IEnumerable<TopProductsDTO>> GetTopProductsByHighestNumberOfOrder()
+        {
+            return await context.Items
+                .Include(oi => oi.Product)
+                    .ThenInclude(p => p.Category)
+                .Include(oi => oi.Product)
+                    .ThenInclude(p => p.Seller)
+                .GroupBy(oi => oi.Product)
+                .Select(g => new TopProductsDTO
+                {
+                    ProductId = g.Key.ProductId,
+                    Name = g.Key.Name,
+                    Price = g.Key.Price,
+                    ImageUrl = g.Key.Image,
+                    OrderCount = g.Count(),
+                    TotalQuantity = g.Sum(oi => oi.Quantity)
+                })
+                .OrderByDescending(x => x.OrderCount)
+                .Take(10)
+                .ToListAsync();
+
+        }
+       public List<ProductDTO> GetProductsByRanges(decimal min, decimal max)
+        {
+            List<Product?> products = context.Products.Where(p=>p.Price <= max && p.Price >= min).ToList();
+            List<ProductDTO> result = new List<ProductDTO>();
+            foreach (var product in products)
+            {
+                ProductDTO dto = new ProductDTO
+                {
+                    ProductId= product.ProductId,
+                    Price = product.Price,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Image = product.Image,
+                    Stock = product.Stock
+                };
+                result.Add(dto);
+            }
+            return result;
+
+        }
     }
 }

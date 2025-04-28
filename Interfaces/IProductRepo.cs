@@ -2,11 +2,17 @@
 {
     public interface IProductRepo: IGenericRepo<Product>
     {
-      //  IEnumerable<Product> GetAllProduct();
+        Product GetProductByName(string name);
+        decimal CalcPriceAfterSale(decimal price , decimal salePercentage);
+        IEnumerable<Product> GetProductsHaveSale();
+
+        Task<IEnumerable<TopProductsDTO>> GetTopProductsByHighestNumberOfOrder();
+
+
         ProductDTO GetProductById(int id);
-        ProductDTO GetProductByName(string name);
-        void AddProduct(AddProductDTO product);
         void EditProduct(int id, AddProductDTO product);
         void DeleteProduct(int id);
+
+        List<ProductDTO> GetProductsByRanges(decimal min, decimal max);
     }
 }

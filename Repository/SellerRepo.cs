@@ -9,19 +9,6 @@ namespace HandmadeMarket.Repository
             this.context = context;
         }
 
-        public void AddSeller(SellerDTO sellerDTO)
-        {
-            Seller seller = new Seller
-            {
-                sellerId = sellerDTO.sellerId,
-                storeName = sellerDTO.storeName,
-                email = sellerDTO.email,
-                phoneNumber = sellerDTO.phoneNumber,
-                createdAt = DateTime.Now
-            };
-            context.Sellers.Add(seller);
-        }
-
         public SellerWithProductsDTO DeleteSellerWithProductsById(int id)
         {
             var sellerData = context.Sellers
@@ -51,82 +38,37 @@ namespace HandmadeMarket.Repository
 
             return sellerData;
         }
-
-        public void EditSeller(int id, SellerDTO sellerDTO)
-        {
-            Seller? seller = context.Sellers
-                .Where(s => s.sellerId == id)
-                .FirstOrDefault();
-
-            seller.storeName = sellerDTO.storeName;
-            seller.email = sellerDTO.email;
-            seller.phoneNumber = sellerDTO.phoneNumber;
-            
-
-        }
-
-        public IQueryable<SellerWithProductsDTO> GetAllSellersWithProducts()
+        public IEnumerable<Seller> GetAllSellersWithProducts()
         {
             var sellers = context.Sellers
-                .Select(s => new SellerWithProductsDTO
-                {
-                    sellerId = s.sellerId,
-                    storeName = s.storeName,
-                    email = s.email,
-                    phoneNumber = s.phoneNumber,
-                    createdAt = s.createdAt,
-                    Products = s.Products.Select(p => new ProductDTO
-                    {
-                        Name = p.Name,
-                        Description = p.Description,
-                        Price = p.Price
-
-                    }).ToList()
-                });
+                .Include(s => s.Products)
+                .ToList();
+               
             return sellers;
         }
 
-        public SellerWithProductsDTO GetSellerWithProductsById(int id)
+        public Seller GetSellerByProductId(int id)
         {
-            SellerWithProductsDTO? sellers =  context.Sellers
+            Seller? seller= context.Sellers
+                .Where(s => s.Products.Any(p => p.ProductId == id))
+                .FirstOrDefault();
+            return seller;
+        }
+
+        public Seller GetSellerWithProductsById(int id)
+        {
+            Seller? sellers =  context.Sellers
                 .Where(s => s.sellerId == id)
-                .Select(s => new SellerWithProductsDTO
-                {
-                    sellerId = s.sellerId,
-                    storeName = s.storeName,
-                    email = s.email,
-                    phoneNumber = s.phoneNumber,
-                    createdAt = s.createdAt,
-                    Products = s.Products.Select(p => new ProductDTO
-                    {
-                        Name = p.Name,
-                        Description = p.Description,
-                        Price = p.Price
-
-                    }).ToList()
-                }).FirstOrDefault();
+                .Include(s => s.Products)
+                .FirstOrDefault();
             return sellers;
         }
 
-        public SellerWithProductsDTO GetSellerWithProductsByStoreName(string storeName)
+        public Seller GetSellerWithProductsByStoreName(string storeName)
         {
-            SellerWithProductsDTO? sellers = context.Sellers
+            Seller? sellers = context.Sellers
                 .Where(s => s.storeName.ToLower().Contains(storeName.ToLower()))
-                .Select(s => new SellerWithProductsDTO
-                {
-                    sellerId = s.sellerId,
-                    storeName = s.storeName,
-                    email = s.email,
-                    phoneNumber = s.phoneNumber,
-                    createdAt = s.createdAt,
-                    Products = s.Products.Select(p => new ProductDTO
-                    {
-                        Name = p.Name,
-                        Description = p.Description,
-                        Price = p.Price
-
-                    }).ToList()
-                }).FirstOrDefault();
+                .FirstOrDefault();
             return sellers;
         }
     }

@@ -10,7 +10,7 @@
         public int Stock { get; set; }
         public string? Image { get; set; }
         public int categoryId { get; set; }
-        public int sellerId { get; set; }
+        public string sellerId { get; set; }
         public bool HasSale { get; set; }
         public decimal SalePercentage { get; set; }
 

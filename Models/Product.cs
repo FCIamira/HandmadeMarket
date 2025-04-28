@@ -16,7 +16,7 @@ namespace HandmadeMarket.Models
         [ForeignKey("Category")]
         public int categoryId { get; set; }
         [ForeignKey("Seller")]
-        public int sellerId { get; set; }
+        public string sellerId { get; set; }
 
         public bool HasSale { get; set; }
         [Column(TypeName = "decimal(18,2)")]

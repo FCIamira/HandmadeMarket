@@ -25,7 +25,7 @@ namespace HandmadeMarket.Controllers
 
             var sellerDtos = sellers.Select(s => new SellerWithProductsDTO
             {
-                sellerId = s.sellerId,
+                sellerId = s.UserId,
                 storeName = s.storeName,
                 email = s.email,
                 phoneNumber = s.phoneNumber,
@@ -53,7 +53,7 @@ namespace HandmadeMarket.Controllers
             {
                 SellerWithProductsDTO sellerWithProductsDTO = new SellerWithProductsDTO
                 {
-                    sellerId = id,
+                    sellerId = seller.UserId,
                     storeName = seller.storeName,
                     email = seller.email,
                     phoneNumber = seller.phoneNumber,
@@ -80,7 +80,7 @@ namespace HandmadeMarket.Controllers
             {
                 SellerWithProductsDTO sellerDTO = new SellerWithProductsDTO
                 {
-                    sellerId = seller.sellerId,
+                    sellerId = seller.UserId,
                     storeName = seller.storeName,
                     email = seller.email,
                     phoneNumber = seller.phoneNumber,
@@ -107,7 +107,7 @@ namespace HandmadeMarket.Controllers
             {
                 SellerDTO sellerDTO = new SellerDTO
                 {
-                    sellerId = seller.sellerId,
+                    sellerId = seller.UserId,
                     storeName = seller.storeName,
                     email = seller.email,
                     phoneNumber = seller.phoneNumber
@@ -121,7 +121,7 @@ namespace HandmadeMarket.Controllers
         {
             Seller seller = new Seller
             {
-                sellerId = sellerDTO.sellerId,
+                UserId = sellerDTO.sellerId,
                 storeName = sellerDTO.storeName,
                 email = sellerDTO.email,
                 phoneNumber = sellerDTO.phoneNumber,
@@ -157,9 +157,9 @@ namespace HandmadeMarket.Controllers
             return BadRequest(ModelState);
         }
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteSellerWithProductsById(int id)
+        public IActionResult DeleteSellerWithProductsById(string id)
         {
-            Seller seller = sellerRepo.GetById(id);
+            Seller seller = sellerRepo.GetSellerById(id);
             if (ModelState.IsValid)
             {
                 if (seller == null)

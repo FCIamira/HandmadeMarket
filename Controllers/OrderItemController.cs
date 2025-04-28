@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HandmadeMarket.Repository;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HandmadeMarket.Controllers
@@ -134,6 +136,34 @@ namespace HandmadeMarket.Controllers
                 orderItemRepo.Save();
                 return Ok("Deleted");
             }
+        }
+        #endregion
+
+
+
+        #region Get All
+
+        [HttpGet("seller-orders")]
+        [Authorize(Roles = "Seller")]
+        public IActionResult GetAllBySellerId()
+        {
+            var sellerId = (User.FindFirst("Id")?.Value);
+            IEnumerable<OrderItem> orders = orderItemRepo.GetAllBySellerId(sellerId);
+            List<OrderItemsWithOrderDetails> DTO = new List<OrderItemsWithOrderDetails>();
+            foreach (OrderItem orderItem in orders) {
+                DTO.Add(new OrderItemsWithOrderDetails
+                {
+                    ProductName=orderItem.Product.Name,
+                    Price=orderItem.Price,
+                    Quantity=orderItem.Quantity,
+                    CustomerAddress=orderItem.Order.Customer.Address,
+                    CustomerName= orderItem.Order.Customer.FirstName,
+                    ShipmentDate=orderItem.Order.Shipment.ShipmentDate
+                });
+            }
+           
+
+            return Ok(DTO);
         }
         #endregion
 

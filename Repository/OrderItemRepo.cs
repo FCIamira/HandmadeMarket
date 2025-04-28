@@ -1,4 +1,6 @@
 ﻿
+using HandmadeMarket.Context;
+
 namespace HandmadeMarket.Repository
 {
     public class OrderItemRepo: GenericRepo<OrderItem>, IOrderItemRepo
@@ -26,6 +28,12 @@ namespace HandmadeMarket.Repository
                 .Include(p => p.Product)
                 .FirstOrDefault(o => o.OrderItemId == id);
             return orderItem;
+        }
+
+        public IEnumerable<OrderItem> GetAllBySellerId(string sellerId)
+        {
+            //return handmadeContext.Orders.Where(o => o.Order_Items[0].Product.sellerId==sellerId).ToList(); 
+            return context.Items.Where(i=>i.Product.sellerId==sellerId).ToList();
         }
     }
     

@@ -42,7 +42,7 @@ namespace HandmadeMarket
                 );
             });
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-               .AddEntityFrameworkStores<HandmadeContext>();
+               .AddEntityFrameworkStores<HandmadeContext>().AddDefaultTokenProviders();
 
             // Setting Authentication Middleware check using JWTToken
             builder.Services.AddAuthentication(options =>
@@ -104,6 +104,7 @@ namespace HandmadeMarket
             });
 
             var app = builder.Build();
+            app.UseStaticFiles();
 
             // Seed Default Roles
             using (var scope = app.Services.CreateScope())

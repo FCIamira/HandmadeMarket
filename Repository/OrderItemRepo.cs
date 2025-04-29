@@ -30,10 +30,15 @@ namespace HandmadeMarket.Repository
             return orderItem;
         }
 
-        public IEnumerable<OrderItem> GetAllBySellerId(string sellerId)
+        public IEnumerable<OrderItem> GetAllBySellerId(string sellerId, int pageNumber, int pageSize)
         {
-            //return handmadeContext.Orders.Where(o => o.Order_Items[0].Product.sellerId==sellerId).ToList(); 
-            return context.Items.Where(i=>i.Product.sellerId==sellerId).ToList();
+            if (pageNumber <= 0) pageNumber = 1;
+            if (pageSize <= 0) pageSize = 5;//not fixed
+            return context.Items
+        .Where(i => i.Product.sellerId == sellerId)
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToList();
         }
     }
     

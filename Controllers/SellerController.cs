@@ -41,10 +41,17 @@ namespace HandmadeMarket.Controllers
             return Ok(sellerDtos);
         }
 
+<<<<<<< HEAD
         [HttpGet("{id:int}")]
         public IActionResult GetSellerById(int id)
         {
             Seller seller = sellerRepo.GetById(id);
+=======
+        [HttpGet("{id}")]
+        public IActionResult GetSellerById(string id)
+        {
+            Seller seller = sellerRepo.GetSellerById(id);
+>>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
             if (seller == null)
             {
                 return NotFound("Seller not found");

@@ -1,5 +1,8 @@
 ﻿using HandmadeMarket.DTO;
+<<<<<<< HEAD
 using HandmadeMarket.Models;
+=======
+>>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +20,7 @@ namespace HandmadeMarket.Controllers
             this.productRepo = productRepo;
         }
         #region GetAll
+<<<<<<< HEAD
         //[Authorize(Roles ="Admin")]
         [HttpGet]
         public IActionResult GetAllProduct(int pageNumber = 1, int pageSize = 10)
@@ -87,6 +91,33 @@ namespace HandmadeMarket.Controllers
         //    }
         //    return Ok(productDTO);
         //}
+=======
+        [HttpGet]
+        [Authorize(Roles ="Admin")]
+
+        public IActionResult GetAllProduct()
+        {
+            IEnumerable<Product> products = productRepo.GetAll();
+            List<ProductDTO> productDTO = products.Select(products => new ProductDTO
+            {
+                ProductId = products.ProductId,
+                Name = products.Name,
+                Description = products.Description,
+                Price = products.Price,
+                Stock = products.Stock,
+                PriceAfterSale = products.PriceAfterSale>0 ? products.PriceAfterSale:products.Price,
+                SalePercentage = products.SalePercentage>0 ? products.SalePercentage:0,
+
+            }).ToList();
+            
+
+            if (products == null)
+            {
+                return NotFound("Product not found");
+            }
+            return Ok(productDTO);
+        }
+>>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
         #endregion
 
         #region GetAll Products that have sale
@@ -132,9 +163,13 @@ namespace HandmadeMarket.Controllers
                     Description = product.Description,
                     Price = product.Price,
                     Stock = product.Stock,
+<<<<<<< HEAD
                     //Image = product.Image,
                     Image = string.IsNullOrEmpty(product.Image) ? null : $"{Request.Scheme}://{Request.Host}{product.Image}",
 
+=======
+                    Image = product.Image,
+>>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
                     PriceAfterSale = product.PriceAfterSale > 0 ? product.PriceAfterSale : product.Price,
                     SalePercentage = product.SalePercentage > 0 ? product.SalePercentage : 0,
                 };
@@ -165,9 +200,13 @@ namespace HandmadeMarket.Controllers
                     Description = product.Description,
                     Price = product.Price,
                     Stock = product.Stock,
+<<<<<<< HEAD
                     //Image = product.Image,
                     Image = string.IsNullOrEmpty(product.Image) ? null : $"{Request.Scheme}://{Request.Host}{product.Image}",
 
+=======
+                    Image = product.Image,
+>>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
                     PriceAfterSale = product.PriceAfterSale > 0 ? product.PriceAfterSale : product.Price,
                     SalePercentage = product.SalePercentage > 0 ? product.SalePercentage : 0,
                 };
@@ -177,6 +216,7 @@ namespace HandmadeMarket.Controllers
         }
         #endregion
 
+<<<<<<< HEAD
         //#region CreateProduct
         //[HttpPost]
         //public IActionResult CreateProduct(AddProductDTO productDTO)
@@ -234,23 +274,40 @@ namespace HandmadeMarket.Controllers
 
             Product product = new Product()
             {
+=======
+        #region CreateProduct
+        [HttpPost]
+        public IActionResult CreateProduct(AddProductDTO productDTO)
+        {
+            Product product = new Product()
+            {
+
+>>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
                 Description = productDTO.Description,
                 Name = productDTO.Name,
                 Price = productDTO.Price,
                 Stock = productDTO.Stock,
+<<<<<<< HEAD
                 Image = imagePath,
+=======
+                Image = productDTO.Image,
+>>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
                 categoryId = productDTO.categoryId,
                 sellerId = productDTO.sellerId,
                 HasSale = productDTO.HasSale,
                 SalePercentage = productDTO.SalePercentage,
                 PriceAfterSale = productRepo.CalcPriceAfterSale(productDTO.Price, productDTO.SalePercentage)
             };
+<<<<<<< HEAD
 
+=======
+>>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
             if (ModelState.IsValid)
             {
                 productRepo.Add(product);
                 productRepo.Save();
                 Product product1 = productRepo.GetById(product.ProductId);
+<<<<<<< HEAD
 
                 // ارجاع المسار في DTO
                 var resultDTO = new ProductDTO
@@ -302,6 +359,17 @@ namespace HandmadeMarket.Controllers
         //    return Ok(existingProduct);
         //}
         #region Edit product
+=======
+                return CreatedAtAction("GetProductById", new { id = product1.ProductId }, productDTO);
+            }
+            else
+                return BadRequest(ModelState);
+
+        }
+        #endregion
+
+        #region Edit product
+>>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
         [HttpPut("{id}")]
         public IActionResult EditProduct(int id, Product product)
         {
@@ -327,6 +395,7 @@ namespace HandmadeMarket.Controllers
             productRepo.Update(id, existingProduct);
             productRepo.Save();
 
+<<<<<<< HEAD
             // رجعي DTO
             var productDTO = new ProductDTO
             {
@@ -343,6 +412,10 @@ namespace HandmadeMarket.Controllers
             return Ok(productDTO);
         }
         #endregion
+=======
+            return Ok(existingProduct);
+        }
+>>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
 
 
         #endregion

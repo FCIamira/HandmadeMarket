@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HandmadeMarket.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HandmadeMarket.Controllers
@@ -63,7 +64,9 @@ namespace HandmadeMarket.Controllers
                         {
                             Name = p.Name,
                             Description = p.Description,
-                            Price = p.Price
+                            Price = p.Price,
+                            Image = string.IsNullOrEmpty(p.Image) ? null : $"{Request.Scheme}://{Request.Host}{p.Image}",
+
                         }).ToList() ?? new List<ProductDTO>()
                     };
                     return Ok(sellerWithProductsDTO);

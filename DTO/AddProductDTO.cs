@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-namespace HandmadeMarket.DTO;
-﻿namespace HandmadeMarket.DTO
+namespace HandmadeMarket.DTO
 {
     public class AddProductDTO
     {
@@ -11,7 +10,6 @@ namespace HandmadeMarket.DTO;
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public IFormFile? Image { get; set; }
-        public string? Image { get; set; }
         public int categoryId { get; set; }
         public string sellerId { get; set; }
         public bool HasSale { get; set; }

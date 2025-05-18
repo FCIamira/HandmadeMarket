@@ -4,6 +4,7 @@ using HandmadeMarket.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
+using HandmadeMarket.DTO;
 
 namespace HandmadeMarket.Repository
 {
@@ -22,21 +23,7 @@ namespace HandmadeMarket.Repository
         }
 
 
-        //public void AddProduct(AddProductDTO product)
-        //{
-        //    Product productDTO = new Product
-        //    {
-        //        sellerId = product.sellerId,
-        //        categoryId = product.categoryId,
-        //        ProductId = product.ProductId,
-        //        Description = product.Description,
-        //        Name = product.Name,
-        //        Price = product.Price,
-        //        Stock = product.Stock,
-        //        Image = product.Image
-        //    };
-        //    context.Add(productDTO);
-        //}
+      
 
         public void DeleteProduct(int id)
         {
@@ -46,6 +33,8 @@ namespace HandmadeMarket.Repository
                 .FirstOrDefault(p => p.ProductId == id);
             context.Products.Remove(product);
         }
+
+
 
         //public void EditProduct(int id, AddProductDTO product)
         //{
@@ -57,30 +46,46 @@ namespace HandmadeMarket.Repository
         //    p.Name = product.Name;
         //    p.Price = product.Price;
         //    p.Stock = product.Stock;
+
+        //    if (product.Image != null && product.Image.Length > 0)
+        //    {
+        //        string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        //        if (!Directory.Exists(uploadsFolder))
+        //        {
+        //            Directory.CreateDirectory(uploadsFolder);
+        //        }
+
+        //        string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(product.Image.FileName);
+        //        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        //        using (var stream = new FileStream(filePath, FileMode.Create))
+        //        {
+        //             product.Image.CopyToAsync(stream);
+        //        }
+
+        //        p.Image = "/uploads/" + uniqueFileName;
+        //    }
+
         //    p.Image = product.Image;
         //    p.categoryId = product.categoryId;
         //    p.sellerId = product.sellerId;
 
         //    context.Update(p);
-
+        //     context.SaveChangesAsync();
 
         //}
-        //public  void EditProduct(int id, AddProductDTO product)
-        //{
-        //    Product? p = context.Products.FirstOrDefault(p => p.ProductId == id);
-
-        //    if (p == null) return; 
 
         public void EditProduct(int id, AddProductDTO product)
         {
-            Product? p = context.Products
-                .Where(p => p.ProductId == id)
-                .FirstOrDefault();
+            Product? p = context.Products.FirstOrDefault(p => p.ProductId == id);
+            if (p == null) return;
 
             p.Description = product.Description;
             p.Name = product.Name;
             p.Price = product.Price;
             p.Stock = product.Stock;
+            p.categoryId = product.categoryId;
+            p.sellerId = product.sellerId;
 
             if (product.Image != null && product.Image.Length > 0)
             {
@@ -98,24 +103,19 @@ namespace HandmadeMarket.Repository
                      product.Image.CopyToAsync(stream);
                 }
 
-                p.Image = "/uploads/" + uniqueFileName; // مسار الصورة في قاعدة البيانات
+                p.Image = "/uploads/" + uniqueFileName;
             }
-
-            p.Image = product.Image;
-            p.categoryId = product.categoryId;
-            p.sellerId = product.sellerId;
 
             context.Update(p);
              context.SaveChangesAsync();
-
         }
 
-        //public IEnumerable<Product> GetAll()
-        //{
+        public IEnumerable<Product> GetAll()
+        {
 
-        //    return context.Products.Include(p => p.Ratings);
+            return context.Products.Include(p => p.Ratings);
 
-        //}
+        }         
 
         public ProductDTO GetProductById(int id)
         {

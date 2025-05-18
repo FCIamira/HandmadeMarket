@@ -1,4 +1,5 @@
 ﻿using HandmadeMarket.DTO;
+using HandmadeMarket.DTO;
 using HandmadeMarket.Models;
 
 using Microsoft.AspNetCore.Authorization;
@@ -187,7 +188,6 @@ namespace HandmadeMarket.Controllers
                     Price = productDTO.Price,
                     Stock = productDTO.Stock,
                     Image = imagePath,
-                    Image = productDTO.Image,
                     categoryId = productDTO.categoryId,
                     sellerId = productDTO.sellerId,
                     HasSale = productDTO.HasSale,

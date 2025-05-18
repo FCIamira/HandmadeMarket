@@ -30,16 +30,13 @@ namespace HandmadeMarket.Controllers
                 return NotFound("No products found.");
             }
 
-            // الحسابات الأساسية للصفحات
-            int totalCount = products.Count();
+1`            int totalCount = products.Count();
             int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-            // تطبيق التجزئة
             var pagedProducts = products
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize);
 
-            // التحويل إلى DTO
             List<ProductDTO> productDTO = pagedProducts.Select(p => new ProductDTO
             {
                 ProductId = p.ProductId,
@@ -52,7 +49,6 @@ namespace HandmadeMarket.Controllers
                 SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
             }).ToList();
 
-            // تغليف النتائج مع معلومات الصفحات
             var response = new
             {
                 CurrentPage = pageNumber,

@@ -124,19 +124,16 @@ namespace HandmadeMarket
             }
 
             // Configure the HTTP request pipeline.
-<<<<<<< HEAD
             //if (app.Environment.IsDevelopment())
             //{
                 app.UseSwagger();
                 app.UseSwaggerUI();
             //}
-=======
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
->>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
 
             app.UseCors("MyPolicy");
             app.UseAuthentication();

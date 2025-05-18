@@ -16,8 +16,6 @@ namespace HandmadeMarket.Models
 <<<<<<< HEAD
         [NotMapped]
         public IFormFile? ImageFile { get; set; } 
-=======
->>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
         [ForeignKey("Category")]
         public int categoryId { get; set; }
         [ForeignKey("Seller")]

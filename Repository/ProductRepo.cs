@@ -47,7 +47,6 @@ namespace HandmadeMarket.Repository
             context.Products.Remove(product);
         }
 
-<<<<<<< HEAD
         //public void EditProduct(int id, AddProductDTO product)
         //{
         //    Product? p = context.Products
@@ -70,25 +69,21 @@ namespace HandmadeMarket.Repository
         {
             Product? p = context.Products.FirstOrDefault(p => p.ProductId == id);
 
-            if (p == null) return; // أو ارجع خطأ مناسب
-=======
+            if (p == null) return; 
+
         public void EditProduct(int id, AddProductDTO product)
         {
             Product? p = context.Products
                 .Where(p => p.ProductId == id)
                 .FirstOrDefault();
->>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
 
             p.Description = product.Description;
             p.Name = product.Name;
             p.Price = product.Price;
             p.Stock = product.Stock;
-<<<<<<< HEAD
 
-            // تحقق من الصورة الجديدة
             if (product.Image != null && product.Image.Length > 0)
             {
-                // مسار الحفظ
                 string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
                 if (!Directory.Exists(uploadsFolder))
                 {
@@ -106,18 +101,13 @@ namespace HandmadeMarket.Repository
                 p.Image = "/uploads/" + uniqueFileName; // مسار الصورة في قاعدة البيانات
             }
 
-=======
             p.Image = product.Image;
->>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
             p.categoryId = product.categoryId;
             p.sellerId = product.sellerId;
 
             context.Update(p);
-<<<<<<< HEAD
              context.SaveChangesAsync();
-=======
 
->>>>>>> f86c7887e775c2545663aef2683b60d7960b5007
         }
 
         public IEnumerable<Product> GetAll()

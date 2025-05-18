@@ -62,7 +62,8 @@ namespace HandmadeMarket.Controllers
                     {
                         Name = p.Name,
                         Description = p.Description,
-                        Price = p.Price
+                        Price = p.Price,
+                        Image = p.Image,
                     }).ToList() ?? new List<ProductDTO>()
                 };
                 return Ok(sellerWithProductsDTO);

@@ -5,10 +5,10 @@ namespace HandmadeMarket.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CatecoryController : ControllerBase
+    public class CategoryController : ControllerBase
     {
         ICategoryRepo categoryRepo;
-        public CatecoryController(ICategoryRepo categoryRepo)
+        public CategoryController(ICategoryRepo categoryRepo)
         {
             this.categoryRepo = categoryRepo;
         }

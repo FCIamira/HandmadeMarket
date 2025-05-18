@@ -65,11 +65,11 @@ namespace HandmadeMarket.Repository
 
 
         //}
-        public  void EditProduct(int id, AddProductDTO product)
-        {
-            Product? p = context.Products.FirstOrDefault(p => p.ProductId == id);
+        //public  void EditProduct(int id, AddProductDTO product)
+        //{
+        //    Product? p = context.Products.FirstOrDefault(p => p.ProductId == id);
 
-            if (p == null) return; 
+        //    if (p == null) return; 
 
         public void EditProduct(int id, AddProductDTO product)
         {
@@ -110,12 +110,12 @@ namespace HandmadeMarket.Repository
 
         }
 
-        public IEnumerable<Product> GetAll()
-        {
+        //public IEnumerable<Product> GetAll()
+        //{
 
-            return context.Products.Include(p => p.Ratings);
+        //    return context.Products.Include(p => p.Ratings);
 
-        }
+        //}
 
         public ProductDTO GetProductById(int id)
         {

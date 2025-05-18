@@ -13,7 +13,6 @@ namespace HandmadeMarket.Models
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public string? Image { get; set; }
-<<<<<<< HEAD
         [NotMapped]
         public IFormFile? ImageFile { get; set; } 
         [ForeignKey("Category")]

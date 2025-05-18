@@ -42,9 +42,9 @@ namespace HandmadeMarket.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public IActionResult GetSellerById(int id)
-        {
-            Seller seller = sellerRepo.GetById(id);
+        //public IActionResult GetSellerById(int id)
+        //{
+        //    Seller seller = sellerRepo.GetById(id);
 
             [HttpGet("{id}")]
             public IActionResult GetSellerById(string id)

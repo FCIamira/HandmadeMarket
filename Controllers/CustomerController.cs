@@ -23,7 +23,7 @@ namespace HandmadeMarket.Controllers
             var customers = customerRepo.GetAll();
             var dtos = customers.Select(c => new CustomerDTO
             {
-                Id = c.Id,
+                Id = c.UserId,
                 FirstName = c.FirstName,
                 LastName = c.LastName,
                 Email = c.Email,
@@ -58,7 +58,7 @@ namespace HandmadeMarket.Controllers
 
                 var result = new CustomerDTO
                 {
-                    Id = customer.Id,
+                    Id = customer.UserId,
                     FirstName = customer.FirstName,
                     LastName = customer.LastName,
                     Email = customer.Email,
@@ -67,7 +67,7 @@ namespace HandmadeMarket.Controllers
                 };
 
                 return CreatedAtAction(nameof(GetCustomerById),
-                                       new { id = customer.Id },
+                                       new { id = customer.UserId },
                                        result);
             }
             #endregion
@@ -96,7 +96,7 @@ namespace HandmadeMarket.Controllers
 
                 var result = new CustomerDTO
                 {
-                    Id = customer.Id,
+                    Id = customer.UserId,
                     FirstName = customer.FirstName,
                     LastName = customer.LastName,
                     Email = customer.Email,
@@ -122,7 +122,7 @@ namespace HandmadeMarket.Controllers
 
                 var dto = new CustomerDTO
                 {
-                    Id = customer.Id,
+                    Id = customer.UserId,
                     FirstName = customer.FirstName,
                     LastName = customer.LastName,
                     Email = customer.Email,
@@ -150,7 +150,7 @@ namespace HandmadeMarket.Controllers
 
         var dtos = customers.Select(c => new CustomerDTO
         {
-            Id = c.Id,
+            Id = c.UserId,
             FirstName = c.FirstName,
             LastName = c.LastName,
             Email = c.Email,

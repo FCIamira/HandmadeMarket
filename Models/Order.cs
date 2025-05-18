@@ -12,7 +12,7 @@ namespace HandmadeMarket.Models
         public decimal Total_Price { get; set; }
 
         [ForeignKey("Customer")]
-        public int CustomerId { get; set; }
+        public string CustomerId { get; set; }
 
         [ForeignKey("Shipment")]
         public int ShipmentId { get; set; }

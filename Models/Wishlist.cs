@@ -7,7 +7,7 @@
         public int Id { get; set; }
 
         [ForeignKey("Customer")]
-        public int CustomerId { get; set; }
+        public string CustomerId { get; set; }
         [ForeignKey("Product")]
         public int ProductId { get; set; }
         public virtual Product? Product { get; set; }

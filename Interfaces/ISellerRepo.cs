@@ -4,7 +4,9 @@
     {
         IEnumerable<Seller>  GetAllSellersWithProducts();
         Seller GetSellerWithProductsByStoreName(string storeName);
-        SellerWithProductsDTO DeleteSellerWithProductsById(int id);
+        SellerWithProductsDTO DeleteSellerWithProductsById(string id);
+        Seller GetSellerWithProductsById(string id);
+        Seller GetSellerById(string id);
         Seller GetSellerByProductId(int id);
     }
 }

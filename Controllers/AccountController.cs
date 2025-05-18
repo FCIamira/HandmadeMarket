@@ -34,7 +34,13 @@ namespace HandmadeMarket.Controllers
                 IdentityResult result = await userManager.CreateAsync(user, userFromConsumer.Password);
                 if (result.Succeeded)
                 {
-                    return Ok("Account Create Success");
+                    // Assign Role here
+                    if (!string.IsNullOrEmpty(userFromConsumer.Role))
+                    {
+                        await userManager.AddToRoleAsync(user, userFromConsumer.Role);
+                    }
+
+                    return Ok("Account Created & Role Assigned");
                 }
                 foreach (var item in result.Errors)
                 {
@@ -56,39 +62,41 @@ namespace HandmadeMarket.Controllers
                     {
                         #region Create Token
                         string jti = Guid.NewGuid().ToString();
+
                         var userRoles = await userManager.GetRolesAsync(user);
 
+                        List<Claim> claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Jti, jti)
+                };
 
-                        List<Claim> claim = new List<Claim>();
-                        claim.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
-                        claim.Add(new Claim(ClaimTypes.Name, user.UserName));
-                        claim.Add(new Claim(JwtRegisteredClaimNames.Jti, jti));
                         if (userRoles != null)
                         {
                             foreach (var role in userRoles)
-
                             {
-                                claim.Add(new Claim(ClaimTypes.Role, role));
+                                claims.Add(new Claim(ClaimTypes.Role, role));
                             }
                         }
-                        //-----------------------------------------------
-                        SymmetricSecurityKey signinKey =
-                            new(Encoding.UTF8.GetBytes(config["JWT:Key"]));
 
-                        SigningCredentials signingCredentials =
-                            new SigningCredentials(signinKey, SecurityAlgorithms.HmacSha256);
+                        //-----------------------------------------------
+
+                        SymmetricSecurityKey signinKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:Key"]));
+
+                        SigningCredentials signingCredentials = new SigningCredentials(signinKey, SecurityAlgorithms.HmacSha256);
 
                         JwtSecurityToken myToken = new JwtSecurityToken(
                             issuer: config["JWT:Iss"],
                             audience: config["JWT:Aud"],
-                            expires: DateTime.Now.AddHours(1),
-                            claims: claim,
+                            expires: DateTime.Now.AddHours(1), 
+                            claims: claims,
                             signingCredentials: signingCredentials
-                            );
+                        );
                         return Ok(new
                         {
-                            expired = DateTime.Now.AddHours(1),
-                            token = new JwtSecurityTokenHandler().WriteToken(myToken)
+                            expired = DateTime.Now.AddHours(1), 
+                            token = new JwtSecurityTokenHandler().WriteToken(myToken) 
                         });
                         #endregion
                     }

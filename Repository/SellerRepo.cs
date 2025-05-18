@@ -9,13 +9,13 @@ namespace HandmadeMarket.Repository
             this.context = context;
         }
 
-        public SellerWithProductsDTO DeleteSellerWithProductsById(int id)
+        public SellerWithProductsDTO DeleteSellerWithProductsById(string id)
         {
             var sellerData = context.Sellers
-                .Where(s => s.sellerId == id)
+                .Where(s => s.UserId == id)
                 .Select(s => new SellerWithProductsDTO
                 {
-                    sellerId = s.sellerId,
+                    sellerId = s.UserId,
                     storeName = s.storeName,
                     email = s.email,
                     phoneNumber = s.phoneNumber,
@@ -33,7 +33,7 @@ namespace HandmadeMarket.Repository
                 .ExecuteDelete();
 
             context.Sellers
-                .Where(s => s.sellerId == id)
+                .Where(s => s.UserId == id)
                 .ExecuteDelete();
 
             return sellerData;
@@ -47,6 +47,15 @@ namespace HandmadeMarket.Repository
             return sellers;
         }
 
+        public Seller GetSellerById(string id)
+        {
+            Seller? seller = context.Sellers
+                .Where(s => s.UserId == id)
+                .Include(s => s.Products)
+                .FirstOrDefault();
+            return seller;
+        }
+
         public Seller GetSellerByProductId(int id)
         {
             Seller? seller= context.Sellers
@@ -55,10 +64,10 @@ namespace HandmadeMarket.Repository
             return seller;
         }
 
-        public Seller GetSellerWithProductsById(int id)
+        public Seller GetSellerWithProductsById(string id)
         {
             Seller? sellers =  context.Sellers
-                .Where(s => s.sellerId == id)
+                .Where(s => s.UserId == id)
                 .Include(s => s.Products)
                 .FirstOrDefault();
             return sellers;

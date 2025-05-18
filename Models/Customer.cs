@@ -2,9 +2,9 @@
 {
     public class Customer
     {
-        public int Id { get; set; }
-        //[Key]
-        //public string UserId { get; set; } 
+        //public int Id { get; set; }
+        [Key]
+        public string UserId { get; set; } 
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
@@ -21,8 +21,8 @@
         public virtual List<Wishlist>? Wishlist { get; set; }
 
         public virtual ICollection<Rating>? Ratings { get; set; }
-        //[ForeignKey("UserId")]
-        //public virtual ApplicationUser? User { get; set; }
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser? User { get; set; }
 
         //public List<Product>? Products { get; set; }
 

@@ -1,4 +1,6 @@
 ﻿
+using HandmadeMarket.Context;
+
 namespace HandmadeMarket.Repository
 {
     public class OrderItemRepo: GenericRepo<OrderItem>, IOrderItemRepo
@@ -26,6 +28,17 @@ namespace HandmadeMarket.Repository
                 .Include(p => p.Product)
                 .FirstOrDefault(o => o.OrderItemId == id);
             return orderItem;
+        }
+
+        public IEnumerable<OrderItem> GetAllBySellerId(string sellerId, int pageNumber, int pageSize)
+        {
+            if (pageNumber <= 0) pageNumber = 1;
+            if (pageSize <= 0) pageSize = 5;//not fixed
+            return context.Items
+        .Where(i => i.Product.sellerId == sellerId)
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToList();
         }
     }
     

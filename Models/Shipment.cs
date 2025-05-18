@@ -10,7 +10,7 @@
         public string ZipCode { get; set; }
         public string Country { get; set; }
         [ForeignKey("Customer")]
-        public int CustomerId { get; set; }
+        public string CustomerId { get; set; }
        public virtual Customer? Customer { get; set; }
         public virtual List<Order>? Orders { get; set; }
 

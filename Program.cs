@@ -8,7 +8,7 @@ namespace HandmadeMarket
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +21,7 @@ namespace HandmadeMarket
             builder.Services.AddScoped<IShipmentRepo, ShipmentRepo>();
             builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
             builder.Services.AddScoped<IRatingRepo, RatingRepo>();
-            builder.Services.AddScoped<IWishList,WishListRepo>();
+            builder.Services.AddScoped<IWishList, WishListRepo>();
             builder.Services.AddControllers();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -31,7 +31,7 @@ namespace HandmadeMarket
             builder.Services.AddDbContext<HandmadeContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             // dependency injection
-            builder.Services.AddScoped<IOrderRepo,OrderRepo>();
+            builder.Services.AddScoped<IOrderRepo, OrderRepo>();
             builder.Services.AddScoped<IProductRepo, ProductRepo>();
             builder.Services.AddScoped<IOrderItemRepo, OrderItemRepo>();
 
@@ -44,12 +44,13 @@ namespace HandmadeMarket
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                .AddEntityFrameworkStores<HandmadeContext>().AddDefaultTokenProviders();
 
-            //Setting Authanticatio  Middleware check using JWTToke
-            builder.Services.AddAuthentication(options => {
+            // Setting Authentication Middleware check using JWTToken
+            builder.Services.AddAuthentication(options =>
+            {
                 options.DefaultAuthenticateScheme =
-                    JwtBearerDefaults.AuthenticationScheme;//check using jwt toke
+                    JwtBearerDefaults.AuthenticationScheme; // check using jwt token
                 options.DefaultChallengeScheme =
-                    JwtBearerDefaults.AuthenticationScheme; //redrect response in case not found cookie | token
+                    JwtBearerDefaults.AuthenticationScheme; // redirect response in case not found cookie | token
                 options.DefaultScheme =
                     JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
@@ -59,7 +60,7 @@ namespace HandmadeMarket
                 options.TokenValidationParameters = new()
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = builder.Configuration["JWT:Iss"],//proivder
+                    ValidIssuer = builder.Configuration["JWT:Iss"], // provider
                     ValidateAudience = true,
                     ValidAudience = builder.Configuration["JWT:Aud"],
                     IssuerSigningKey = new SymmetricSecurityKey
@@ -67,21 +68,16 @@ namespace HandmadeMarket
                 };
             });
 
-
-
-            builder.Services.AddEndpointsApiExplorer();
-            //Swagget Setting
-            //   builder.Services.AddSwaggerGen();
             builder.Services.AddSwaggerGen(swagger =>
             {
-                //This is to generate the Default UI of Swagger Documentation    
+                // This is to generate the Default UI of Swagger Documentation
                 swagger.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "ASP.NET 5 Web API",
-                    Description = " ITI Projrcy"
+                    Title = "ASP.NET 5 Web API",
+                    Description = "ITI Project"
                 });
-                // To Enable authorization using Swagger (JWT)    
+                // To Enable authorization using Swagger (JWT)
                 swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {
                     Name = "Authorization",
@@ -89,7 +85,7 @@ namespace HandmadeMarket
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"",
+                    Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"",
                 });
                 swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
@@ -110,6 +106,23 @@ namespace HandmadeMarket
             var app = builder.Build();
             app.UseStaticFiles();
 
+            // Seed Default Roles
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+                string[] roles = { "Admin", "Customer", "Seller" };
+
+                foreach (var role in roles)
+                {
+                    var roleExists = await roleManager.RoleExistsAsync(role);
+                    if (!roleExists)
+                    {
+                        await roleManager.CreateAsync(new IdentityRole(role));
+                    }
+                }
+            }
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -117,9 +130,9 @@ namespace HandmadeMarket
                 app.UseSwaggerUI();
             }
 
-            app.UseAuthorization();
-            app.UseAuthentication(); 
             app.UseCors("MyPolicy");
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.MapControllers();
 
             app.Run();

@@ -1,4 +1,5 @@
 ﻿using HandmadeMarket.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,8 @@ namespace HandmadeMarket.Controllers
         }
         #region GetAll
         [HttpGet]
+        [Authorize(Roles ="Admin")]
+
         public IActionResult GetAllProduct()
         {
             IEnumerable<Product> products = productRepo.GetAll();

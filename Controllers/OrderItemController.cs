@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HandmadeMarket.Repository;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HandmadeMarket.Controllers
@@ -134,6 +136,49 @@ namespace HandmadeMarket.Controllers
                 orderItemRepo.Save();
                 return Ok("Deleted");
             }
+        }
+        #endregion
+
+
+
+        #region Get All
+
+        [HttpGet("seller-orders")]
+       // [Authorize(Roles = "Seller")]
+        public IActionResult GetAllBySellerId(int pageNumber = 1, int pageSize = 5)
+        {
+            var sellerId = (User.FindFirst("Id")?.Value);
+            if (sellerId != null)
+            {
+                IEnumerable<OrderItem> orders = orderItemRepo.GetAllBySellerId(sellerId, pageSize, pageNumber);
+                List<OrderItemsWithOrderDetails> DTO = new List<OrderItemsWithOrderDetails>();
+
+                foreach (OrderItem orderItem in orders)
+                {
+                    if (orderItem.Product != null && orderItem.Order?.Customer != null && orderItem.Order?.Shipment != null)
+                    {
+                        DTO.Add(new OrderItemsWithOrderDetails
+                        {
+                            ProductName = orderItem.Product.Name,
+                            Price = orderItem.Price,
+                            Quantity = orderItem.Quantity,
+                            CustomerAddress = orderItem.Order.Customer.Address,
+                            CustomerName = orderItem.Order.Customer.FirstName,
+                            ShipmentDate = orderItem.Order.Shipment.ShipmentDate
+                        });
+                    }
+                
+
+                }
+                return Ok(DTO);
+
+            }
+            else
+            {
+                return NotFound("sell doesn't exist");
+            }
+           
+          
         }
         #endregion
 

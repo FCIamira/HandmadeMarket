@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HandmadeMarket.Migrations
 {
     [DbContext(typeof(HandmadeContext))]
-    [Migration("20250416001232_IntialCreate")]
-    partial class IntialCreate
+    [Migration("20250422183121_identity")]
+    partial class identity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -98,8 +98,9 @@ namespace HandmadeMarket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -134,11 +135,8 @@ namespace HandmadeMarket.Migrations
 
             modelBuilder.Entity("HandmadeMarket.Models.Customer", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -164,7 +162,7 @@ namespace HandmadeMarket.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.ToTable("Customers");
                 });
@@ -177,8 +175,9 @@ namespace HandmadeMarket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Order_Date")
                         .HasColumnType("datetime2");
@@ -238,6 +237,9 @@ namespace HandmadeMarket.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HasSale")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
@@ -247,8 +249,14 @@ namespace HandmadeMarket.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<decimal?>("PriceAfterSale")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("SKU")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("SalePercentage")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
@@ -256,8 +264,9 @@ namespace HandmadeMarket.Migrations
                     b.Property<int>("categoryId")
                         .HasColumnType("int");
 
-                    b.Property<int>("sellerId")
-                        .HasColumnType("int");
+                    b.Property<string>("sellerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ProductId");
 
@@ -268,13 +277,40 @@ namespace HandmadeMarket.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("HandmadeMarket.Models.Seller", b =>
+            modelBuilder.Entity("HandmadeMarket.Models.Rating", b =>
                 {
-                    b.Property<int>("sellerId")
+                    b.Property<int>("RatingId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("sellerId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RatingId"));
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.HasKey("RatingId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Ratings");
+                });
+
+            modelBuilder.Entity("HandmadeMarket.Models.Seller", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("createdAt")
                         .HasColumnType("datetime2");
@@ -288,7 +324,7 @@ namespace HandmadeMarket.Migrations
                     b.Property<string>("storeName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("sellerId");
+                    b.HasKey("UserId");
 
                     b.ToTable("Sellers");
                 });
@@ -313,8 +349,9 @@ namespace HandmadeMarket.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("ShipmentDate")
                         .HasColumnType("datetime2");
@@ -342,8 +379,9 @@ namespace HandmadeMarket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -509,6 +547,17 @@ namespace HandmadeMarket.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("HandmadeMarket.Models.Customer", b =>
+                {
+                    b.HasOne("HandmadeMarket.Models.ApplicationUser", "User")
+                        .WithOne("Customer")
+                        .HasForeignKey("HandmadeMarket.Models.Customer", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("HandmadeMarket.Models.Order", b =>
                 {
                     b.HasOne("HandmadeMarket.Models.Customer", "Customer")
@@ -564,6 +613,36 @@ namespace HandmadeMarket.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Seller");
+                });
+
+            modelBuilder.Entity("HandmadeMarket.Models.Rating", b =>
+                {
+                    b.HasOne("HandmadeMarket.Models.Customer", "Customer")
+                        .WithMany("Ratings")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HandmadeMarket.Models.Product", "Product")
+                        .WithMany("Ratings")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("HandmadeMarket.Models.Seller", b =>
+                {
+                    b.HasOne("HandmadeMarket.Models.ApplicationUser", "User")
+                        .WithOne("Seller")
+                        .HasForeignKey("HandmadeMarket.Models.Seller", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Shipment", b =>
@@ -647,6 +726,13 @@ namespace HandmadeMarket.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("HandmadeMarket.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Customer");
+
+                    b.Navigation("Seller");
+                });
+
             modelBuilder.Entity("HandmadeMarket.Models.Category", b =>
                 {
                     b.Navigation("Products");
@@ -658,6 +744,8 @@ namespace HandmadeMarket.Migrations
 
                     b.Navigation("Orders");
 
+                    b.Navigation("Ratings");
+
                     b.Navigation("Shipments");
 
                     b.Navigation("Wishlist");
@@ -666,6 +754,11 @@ namespace HandmadeMarket.Migrations
             modelBuilder.Entity("HandmadeMarket.Models.Order", b =>
                 {
                     b.Navigation("Order_Items");
+                });
+
+            modelBuilder.Entity("HandmadeMarket.Models.Product", b =>
+                {
+                    b.Navigation("Ratings");
                 });
 
             modelBuilder.Entity("HandmadeMarket.Models.Seller", b =>

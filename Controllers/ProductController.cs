@@ -71,7 +71,10 @@ namespace HandmadeMarket.Controllers
         public IActionResult GetAllProductsHaveSale()
         {
             IEnumerable<Product> products = productRepo.GetProductsHaveSale();
-            List<ProductDTO> productDTO = products.Select(products => new ProductDTO
+            var productsWithSale = products
+       .Where(p => p.SalePercentage > 0 && p.PriceAfterSale < p.Price)
+       .ToList();
+            List<ProductDTO> productDTO = productsWithSale.Select(products => new ProductDTO
             {
                 ProductId = products.ProductId,
                 Name = products.Name,
@@ -80,6 +83,7 @@ namespace HandmadeMarket.Controllers
                 Stock = products.Stock,
                 PriceAfterSale = products.PriceAfterSale,
                 SalePercentage = products.SalePercentage,
+                Image = string.IsNullOrEmpty(products.Image) ? null : $"{Request.Scheme}://{Request.Host}{products.Image}",
             }).ToList();
 
             if (products == null)

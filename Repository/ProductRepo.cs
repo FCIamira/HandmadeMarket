@@ -141,14 +141,21 @@ namespace HandmadeMarket.Repository
             return product;
         }
 
+        //public IEnumerable<Product> GetProductsHaveSale()
+        //{
+        //    IEnumerable<Product> products = context.Products
+        //        .Include(p => p.Ratings)
+        //        .Where(s => s.HasSale);
+        //    return products;
+
+        //}
         public IEnumerable<Product> GetProductsHaveSale()
         {
-            IEnumerable<Product> products = context.Products
-                .Include(p => p.Ratings)
-                .Where(s => s.HasSale);
-            return products;
-
+            return context.Products
+                .Where(p => p.SalePercentage > 0 && p.PriceAfterSale < p.Price)
+                .ToList();
         }
+
 
 
         public async Task<IEnumerable<TopProductsDTO>> GetTopProductsByHighestNumberOfOrder()

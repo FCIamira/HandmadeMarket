@@ -23,8 +23,5 @@
         public virtual ICollection<Rating>? Ratings { get; set; }
         [ForeignKey("UserId")]
         public virtual ApplicationUser? User { get; set; }
-
-        //public List<Product>? Products { get; set; }
-
     }
 }

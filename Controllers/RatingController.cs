@@ -18,6 +18,27 @@ namespace HandmadeMarket.Controllers
         }
 
 
+        [HttpGet("{productId}/ratings")]
+        public ActionResult<IEnumerable<RatingDTO>> GetRatingsByProductId(int productId)
+        {
+            // Check if the product exists
+            var product = productRepo.GetById(productId);
+            if (product == null)
+            {
+                return NotFound("Product not found.");
+            }
+            // Get ratings for the specified product
+            var ratings = ratingRepo.GetRateingsByProductId(productId)
+                .Select(r => new RatingDTO
+                {
+                    Score = r.Score,
+                    Comment = r.Comment,
+                    CustomerId = r.CustomerId
+                })
+                .ToList();
+            return Ok(ratings);
+        }
+
         // add rating to product
         [HttpPost("{productId}/rate")]
         public IActionResult RateProduct(int productId, [FromBody] RatingDTO rating)

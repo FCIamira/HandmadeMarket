@@ -14,11 +14,15 @@ namespace HandmadeMarket.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IConfiguration config;
+        private readonly HandmadeContext handmadeContext;
+      
 
-        public AccountController(UserManager<ApplicationUser> userManager, IConfiguration config)
+        public AccountController(UserManager<ApplicationUser> userManager, IConfiguration config,HandmadeContext handmadeContext)
         {
             this.userManager = userManager;
             this.config = config;
+            this.handmadeContext = handmadeContext;
+         
         }
 
         [HttpPost("register")]
@@ -34,10 +38,44 @@ namespace HandmadeMarket.Controllers
                 IdentityResult result = await userManager.CreateAsync(user, userFromConsumer.Password);
                 if (result.Succeeded)
                 {
-                    // Assign Role here
+                    // Assign Roles 
                     if (!string.IsNullOrEmpty(userFromConsumer.Role))
                     {
                         await userManager.AddToRoleAsync(user, userFromConsumer.Role);
+                      // Assign Customer Role 
+                        if (userFromConsumer.Role == "Customer")
+                        {
+                            Customer customer = new Customer
+                            {
+                                UserId = user.Id,
+                                FirstName = userFromConsumer.FirstName,  
+                                LastName = userFromConsumer.LastName,
+                                Email = userFromConsumer.Email,
+                                Phone = userFromConsumer.Phone,
+                                Address = userFromConsumer.Address,
+                                Password = userFromConsumer.Password
+                            };
+
+                            handmadeContext.Customers.Add(customer);
+                            await handmadeContext.SaveChangesAsync();
+                        }
+                        // Assign Seller Role 
+                        if (userFromConsumer.Role == "Seller")
+                        {
+                            Seller seller = new Seller
+                            {
+                                UserId = user.Id,
+                                 storeName = userFromConsumer.UserName,
+                                email = userFromConsumer.Email,
+                               phoneNumber = userFromConsumer.Phone,
+                                createdAt = DateTime.Now,
+                               
+                            };
+
+                            handmadeContext.Sellers.Add(seller);
+                            await handmadeContext.SaveChangesAsync();
+                        }
+
                     }
 
                     return Ok("Account Created & Role Assigned");

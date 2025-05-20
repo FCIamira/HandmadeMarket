@@ -48,12 +48,11 @@ namespace HandmadeMarket.Controllers
                             Customer customer = new Customer
                             {
                                 UserId = user.Id,
-                                FirstName = userFromConsumer.FirstName,  
-                                LastName = userFromConsumer.LastName,
+                               
                                 Email = userFromConsumer.Email,
-                                Phone = userFromConsumer.Phone,
-                                Address = userFromConsumer.Address,
+                               
                                 Password = userFromConsumer.Password
+                                
                             };
 
                             handmadeContext.Customers.Add(customer);
@@ -67,7 +66,6 @@ namespace HandmadeMarket.Controllers
                                 UserId = user.Id,
                                  storeName = userFromConsumer.UserName,
                                 email = userFromConsumer.Email,
-                               phoneNumber = userFromConsumer.Phone,
                                 createdAt = DateTime.Now,
                                
                             };

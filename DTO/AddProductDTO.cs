@@ -11,7 +11,7 @@ namespace HandmadeMarket.DTO
         public int Stock { get; set; }
         public IFormFile? Image { get; set; }
         public int categoryId { get; set; }
-        public string sellerId { get; set; }
+       // public string sellerId { get; set; }
         public bool HasSale { get; set; }
         public decimal SalePercentage { get; set; }
 

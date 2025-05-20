@@ -5,6 +5,7 @@ using HandmadeMarket.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HandmadeMarket.Controllers
 {
@@ -155,6 +156,7 @@ namespace HandmadeMarket.Controllers
 
 
         #region CreateProduct 
+        [Authorize(Roles = "Seller")]
 
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromForm] AddProductDTO productDTO)
@@ -176,98 +178,134 @@ namespace HandmadeMarket.Controllers
                     await productDTO.Image.CopyToAsync(stream);
                 }
 
-                imagePath = "/uploads/" + uniqueFileName; 
+                imagePath = "/uploads/" + uniqueFileName;
             }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             Product product = new Product()
             {
-               
 
-                    Description = productDTO.Description,
-                    Name = productDTO.Name,
-                    Price = productDTO.Price,
-                    Stock = productDTO.Stock,
-                    Image = imagePath,
-                    categoryId = productDTO.categoryId,
-                    sellerId = productDTO.sellerId,
-                    HasSale = productDTO.HasSale,
-                    SalePercentage = productDTO.SalePercentage,
-                    PriceAfterSale = productRepo.CalcPriceAfterSale(productDTO.Price, productDTO.SalePercentage)
+
+                Description = productDTO.Description,
+                Name = productDTO.Name,
+                Price = productDTO.Price,
+                Stock = productDTO.Stock,
+                Image = imagePath,
+                categoryId = productDTO.categoryId,
+                sellerId = userId,
+                HasSale = productDTO.HasSale,
+                SalePercentage = productDTO.SalePercentage,
+                PriceAfterSale = productRepo.CalcPriceAfterSale(productDTO.Price, productDTO.SalePercentage)
+            };
+
+            if (ModelState.IsValid)
+            {
+                productRepo.Add(product);
+                productRepo.Save();
+                Product product1 = productRepo.GetById(product.ProductId);
+
+                var resultDTO = new ProductDTO
+                {
+                    ProductId = product1.ProductId,
+                    Name = product1.Name,
+                    Description = product1.Description,
+                    Price = product1.Price,
+                    Stock = product1.Stock,
+                    //Image = product1.Image,
+                    Image = string.IsNullOrEmpty(product.Image) ? null : $"{Request.Scheme}://{Request.Host}{product.Image}",
+
+                    PriceAfterSale = product1.PriceAfterSale,
+                    SalePercentage = product1.SalePercentage ?? 0
                 };
 
-                if (ModelState.IsValid)
-                {
-                    productRepo.Add(product);
-                    productRepo.Save();
-                    Product product1 = productRepo.GetById(product.ProductId);
-
-                    var resultDTO = new ProductDTO
-                    {
-                        ProductId = product1.ProductId,
-                        Name = product1.Name,
-                        Description = product1.Description,
-                        Price = product1.Price,
-                        Stock = product1.Stock,
-                        //Image = product1.Image,
-                        Image = string.IsNullOrEmpty(product.Image) ? null : $"{Request.Scheme}://{Request.Host}{product.Image}",
-
-                        PriceAfterSale = product1.PriceAfterSale,
-                        SalePercentage = product1.SalePercentage ?? 0
-                    };
-
-                    return CreatedAtAction("GetProductById", new { id = product1.ProductId }, resultDTO);
-                }
-                else
-                    return BadRequest(ModelState);
+                return CreatedAtAction("GetProductById", new { id = product1.ProductId }, resultDTO);
             }
+            else
+                return BadRequest(ModelState);
+        }
 
 
         #endregion
-       
+
 
         #region Edit product
-            [HttpPut("{id}")]
-            public IActionResult EditProduct(int id, Product product)
+        //[HttpPut("{id}")]
+        //    public IActionResult EditProduct(int id, Product product)
+        //    {
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return BadRequest(ModelState);
+        //        }
+
+        //        Product existingProduct = productRepo.GetById(id);
+        //        if (existingProduct == null)
+        //        {
+        //            return NotFound("Product not found");
+        //        }
+        //        string userId =
+        //        existingProduct.Description = product.Description;
+        //        existingProduct.Name = product.Name;
+        //        existingProduct.Price = product.Price;
+        //        existingProduct.Stock = product.Stock;
+        //        existingProduct.Image = product.Image;
+        //        existingProduct.categoryId = product.categoryId;
+        //        existingProduct.sellerId = product.sellerId;
+
+        //        productRepo.EditProduct(id, existingProduct,userId);
+        //        productRepo.Save();
+
+        //        var productDTO = new ProductDTO
+        //        {
+        //            ProductId = existingProduct.ProductId,
+        //            Name = existingProduct.Name,
+        //            Description = existingProduct.Description,
+        //            Price = existingProduct.Price,
+        //            Stock = existingProduct.Stock,
+        //            Image = string.IsNullOrEmpty(existingProduct.Image) ? null : $"{Request.Scheme}://{Request.Host}{existingProduct.Image}",
+        //            SalePercentage = existingProduct.SalePercentage ?? 0,
+        //            PriceAfterSale = existingProduct.PriceAfterSale > 0 ? existingProduct.PriceAfterSale : existingProduct.Price
+        //        };
+
+        //        return Ok(productDTO);
+        //    }
+        [HttpPut("{id}")]
+        public IActionResult EditProduct(int id, [FromForm] AddProductDTO productDto)
+        {
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
-                Product existingProduct = productRepo.GetById(id);
-                if (existingProduct == null)
-                {
-                    return NotFound("Product not found");
-                }
-
-                existingProduct.Description = product.Description;
-                existingProduct.Name = product.Name;
-                existingProduct.Price = product.Price;
-                existingProduct.Stock = product.Stock;
-                existingProduct.Image = product.Image;
-                existingProduct.categoryId = product.categoryId;
-                existingProduct.sellerId = product.sellerId;
-
-                productRepo.Update(id, existingProduct);
-                productRepo.Save();
-
-                var productDTO = new ProductDTO
-                {
-                    ProductId = existingProduct.ProductId,
-                    Name = existingProduct.Name,
-                    Description = existingProduct.Description,
-                    Price = existingProduct.Price,
-                    Stock = existingProduct.Stock,
-                    Image = string.IsNullOrEmpty(existingProduct.Image) ? null : $"{Request.Scheme}://{Request.Host}{existingProduct.Image}",
-                    SalePercentage = existingProduct.SalePercentage ?? 0,
-                    PriceAfterSale = existingProduct.PriceAfterSale > 0 ? existingProduct.PriceAfterSale : existingProduct.Price
-                };
-
-                return Ok(productDTO);
+                return BadRequest(ModelState);
             }
+
+            Product existingProduct = productRepo.GetById(id);
+            if (existingProduct == null)
+            {
+                return NotFound("Product not found");
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            productRepo.EditProduct(id, productDto, userId);
+            productRepo.Save();
+
+            var updatedProduct = productRepo.GetById(id);
+
+            var productDTO = new ProductDTO
+            {
+                ProductId = updatedProduct.ProductId,
+                Name = updatedProduct.Name,
+                Description = updatedProduct.Description,
+                Price = updatedProduct.Price,
+                Stock = updatedProduct.Stock,
+                Image = string.IsNullOrEmpty(updatedProduct.Image) ? null : $"{Request.Scheme}://{Request.Host}{updatedProduct.Image}",
+                SalePercentage = updatedProduct.SalePercentage ?? 0,
+                PriceAfterSale = updatedProduct.PriceAfterSale > 0 ? updatedProduct.PriceAfterSale : updatedProduct.Price
+            };
+
+            return Ok(productDTO);
+        }
+
         #endregion
-        
-    
+
 
 
 
@@ -291,7 +329,7 @@ namespace HandmadeMarket.Controllers
         [HttpGet("top-ordered-with-details")]
         public async Task<ActionResult> GetTopOrderedProductsWithDetails()
         {
-            
+
             var topProducts = await productRepo.GetTopProductsByHighestNumberOfOrder();
             return Ok(topProducts);
         }
@@ -299,10 +337,10 @@ namespace HandmadeMarket.Controllers
 
 
         [HttpGet("p")]
-        public IActionResult FilterProductsByPrice(decimal min, decimal max) { 
-        List<ProductDTO> products=productRepo.GetProductsByRanges(min, max);
+        public IActionResult FilterProductsByPrice(decimal min, decimal max) {
+            List<ProductDTO> products = productRepo.GetProductsByRanges(min, max);
             return Ok(products);
-        
+
         }
 
     }

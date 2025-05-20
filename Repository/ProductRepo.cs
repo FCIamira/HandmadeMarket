@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 using HandmadeMarket.DTO;
+using System.Security.Claims;
 
 namespace HandmadeMarket.Repository
 {
@@ -75,8 +76,10 @@ namespace HandmadeMarket.Repository
 
         //}
 
-        public void EditProduct(int id, AddProductDTO product)
+        public void EditProduct(int id, AddProductDTO product, string userId)
         {
+            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             Product? p = context.Products.FirstOrDefault(p => p.ProductId == id);
             if (p == null) return;
 
@@ -85,7 +88,7 @@ namespace HandmadeMarket.Repository
             p.Price = product.Price;
             p.Stock = product.Stock;
             p.categoryId = product.categoryId;
-            p.sellerId = product.sellerId;
+            p.sellerId = userId;
 
             if (product.Image != null && product.Image.Length > 0)
             {

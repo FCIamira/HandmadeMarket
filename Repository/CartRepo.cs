@@ -16,7 +16,7 @@
             {
                 Id = c.Id,
                 ProductId = c.ProductId,
-                ProductName = c.Product.Name,
+                //ProductName = c.Product.Name,
                 Quantity = c.Quantity,
 
             }

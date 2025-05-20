@@ -21,7 +21,7 @@ namespace HandmadeMarket.Repository
             return items;
         }
 
-        public OrderItem GetById(int id)
+        public virtual OrderItem GetById(int id)
         {
             OrderItem orderItem = context.Items
                 .Include(o => o.Order)

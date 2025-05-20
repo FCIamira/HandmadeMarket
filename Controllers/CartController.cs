@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HandmadeMarket.Controllers
 {
@@ -32,19 +34,28 @@ namespace HandmadeMarket.Controllers
             return NotFound("Invalid Id");
         }
         [HttpPost]
+        [Authorize]
         public IActionResult Add([FromBody] CartWithProductDTO dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User not authenticated");
+
+            //if (!User.IsInRole("Customer"))
+            //    return Forbid("Only Customer with the 'user' role can add to the cart.");
+
 
             var cart = new Cart
             {
                 Id = dto.Id,
                 Quantity = dto.Quantity,
                 ProductId = dto.ProductId,
-                CustomerId = dto.CustomerId ?? "default-customer-id" // Set proper value
+                CustomerId = userId
             };
 
             cartRepo.Add(cart);

@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 
 namespace HandmadeMarket
 {
@@ -64,7 +65,9 @@ namespace HandmadeMarket
                     ValidateAudience = true,
                     ValidAudience = builder.Configuration["JWT:Aud"],
                     IssuerSigningKey = new SymmetricSecurityKey
-                    (Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
+                    (Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])),
+                        RoleClaimType = ClaimTypes.Role
+
                 };
             });
 

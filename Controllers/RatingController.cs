@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -49,6 +50,8 @@ namespace HandmadeMarket.Controllers
             {
                 return NotFound("Product not found.");
             }
+            var UserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;                        
+            string userRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
             // Check if this customer already rated this product
             var existingRating = ratingRepo.GetAll()

@@ -32,15 +32,27 @@ namespace HandmadeMarket.Controllers
             return NotFound("Invalid Id");
         }
         [HttpPost]
-        public IActionResult Add(Cart cart)
+        public IActionResult Add([FromBody] CartWithProductDTO dto)
         {
-            if (ModelState.IsValid) { 
-            cartRepo.Add(cart);
-                cartRepo.Save();
-                return Created();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
-            return BadRequest();
+
+            var cart = new Cart
+            {
+                Id = dto.Id,
+                Quantity = dto.Quantity,
+                ProductId = dto.ProductId,
+                CustomerId = dto.CustomerId ?? "default-customer-id" // Set proper value
+            };
+
+            cartRepo.Add(cart);
+            cartRepo.Save();
+
+            return CreatedAtAction(nameof(Add), new { id = cart.Id }, dto);
         }
+
 
         //////////////////Delete
         [HttpDelete]

@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,9 @@ namespace HandmadeMarket.Controllers
         [HttpGet("{productId}/ratings")]
         public ActionResult<IEnumerable<RatingDTO>> GetRatingsByProductId(int productId)
         {
+            var UserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            string userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
             // Check if the product exists
             var product = productRepo.GetById(productId);
             if (product == null)
@@ -34,7 +38,7 @@ namespace HandmadeMarket.Controllers
                 {
                     Score = r.Score,
                     Comment = r.Comment,
-                    CustomerId = r.CustomerId
+                    CustomerId = UserId
                 })
                 .ToList();
             return Ok(ratings);
@@ -42,8 +46,10 @@ namespace HandmadeMarket.Controllers
 
         // add rating to product
         [HttpPost("{productId}/rate")]
-        public IActionResult RateProduct(int productId, [FromBody] RatingDTO rating)
+        [Authorize (Roles = "Customer")]
+        public IActionResult RateProduct(int productId, [FromBody] AddRateDTO rating)
         {
+
             // Check if the product exists
             var product =  productRepo.GetById(productId);
             if (product == null)
@@ -55,7 +61,7 @@ namespace HandmadeMarket.Controllers
 
             // Check if this customer already rated this product
             var existingRating = ratingRepo.GetAll()
-                .FirstOrDefault(r => r.ProductId == productId && r.CustomerId == rating.CustomerId);
+                .FirstOrDefault(r => r.ProductId == productId && r.CustomerId == UserId);
 
             if (existingRating != null)
             {
@@ -72,7 +78,7 @@ namespace HandmadeMarket.Controllers
             {
                 Score = rating.Score,
                 Comment = rating.Comment,
-                CustomerId = rating.CustomerId
+                CustomerId = UserId
                 ,
                 ProductId = productId
             };

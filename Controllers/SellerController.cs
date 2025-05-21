@@ -62,10 +62,12 @@ namespace HandmadeMarket.Controllers
                     createdAt = seller.createdAt,
                     Products = seller.Products?.Select(p => new ProductDTO
                     {
+                        ProductId = p.ProductId,
                         Name = p.Name,
                         Description = p.Description,
                         Price = p.Price,
                         Image = p.Image,
+                        Stock = p.Stock,
                     }).ToList() ?? new List<ProductDTO>()
                 };
                 return Ok(sellerWithProductsDTO);

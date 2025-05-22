@@ -227,7 +227,7 @@ namespace HandmadeMarket.Controllers
         #region Edit product
        
         [HttpPut("{id}")]
-        public IActionResult EditProduct(int id, [FromBody] AddProductDTO productDto)
+        public IActionResult EditProduct(int id, [FromForm] AddProductDTO productDto)
         {
             if (!ModelState.IsValid)
             {
@@ -255,7 +255,6 @@ namespace HandmadeMarket.Controllers
                 Description = updatedProduct.Description,
                 Price = updatedProduct.Price,
                 Stock = updatedProduct.Stock,
-
                 Image = string.IsNullOrEmpty(updatedProduct.Image) ? null : $"{Request.Scheme}://{Request.Host}{updatedProduct.Image}",
                 SalePercentage = updatedProduct.SalePercentage ?? 0,
                 PriceAfterSale = updatedProduct.PriceAfterSale > 0 ? updatedProduct.PriceAfterSale : updatedProduct.Price
@@ -266,10 +265,6 @@ namespace HandmadeMarket.Controllers
         }
 
         #endregion
-
-
-
-
         #region delete product
 
         [HttpDelete("{id:int}")]

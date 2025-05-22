@@ -1,5 +1,7 @@
 ﻿using HandmadeMarket.Context;
+using HandmadeMarket.Interfaces;
 using HandmadeMarket.Repository;
+using HandmadeMarket.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,120 +14,122 @@ namespace HandmadeMarket.Controllers
 
     public class CartController : ControllerBase
     {
-      private   ICartRepo cartRepo { get; set; }
-        public CartController(ICartRepo cartRepo) { 
+      private CartServices cartRepo { get; set; }
+
+        public CartController(CartServices cartRepo) { 
             this.cartRepo = cartRepo;
+            
         }
+        #region GetAll
         [HttpGet]
         public IActionResult GetAll()
         {
-            IEnumerable<Cart> carts = cartRepo.GetAll();
-
-            if (carts == null || !carts.Any())
-                return NotFound("No carts found");
-
-            var cartsDto = carts.Select(c => new CartGetAll
+            var result = cartRepo.GetAll();
+            if (result.IsSuccess)
             {
-                Id = c.Id,
-                ProductId = c.ProductId,
-                ProductName = c.Product.Name,
-                Quantity = c.Quantity,
-                Price = c.Product.Price,
-                Stock=c.Product.Stock,
-                Image = string.IsNullOrEmpty(c.Product.Image) ? null : $"{Request.Scheme}://{Request.Host}{c.Product.Image}"
-            }).ToList();
+                return Ok(result);
+            }
+            return BadRequest(result);
 
-            return Ok(cartsDto);
         }
 
+        #endregion
+
+        #region GetById
         [HttpGet("{id:int}")]
         public IActionResult GetById(int id)
         {
-           Cart cart = cartRepo.GetById(id);
-            if (cart != null)
+            var result = cartRepo.GetById(id);
+            if (result.IsSuccess)
             {
-
-                return Ok(cart);
+                return Ok(result);
             }
-            return NotFound("Invalid Id");
+            return BadRequest(result);
+
         }
-        [HttpPost]
-        public IActionResult Add([FromBody] CartWithProductDTO dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        #endregion
 
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized("User not authenticated");
+
+        //#region MyRegion
+        //[HttpPost]
+        //public IActionResult Add([FromBody] CartWithProductDTO dto)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //    if (string.IsNullOrEmpty(userId))
+        //        return Unauthorized("User not authenticated");
 
             //if (!User.IsInRole("Customer"))
             //    return Forbid("Only Customer with the 'user' role can add to the cart.");
 
 
-            var cart = new Cart
-            {
-                Id = dto.Id,
-                Quantity = dto.Quantity,
-                ProductId = dto.ProductId,
-                CustomerId = userId
-            };
+        //    var cart = new Cart
+        //    {
+        //        Id = dto.Id,
+        //        Quantity = dto.Quantity,
+        //        ProductId = dto.ProductId,
+        //        CustomerId = userId
+        //    };
 
-            cartRepo.Add(cart);
-            cartRepo.Save();
+        //    cartRepo.Add(cart);
+        //    cartRepo.Save();
 
-            return CreatedAtAction(nameof(Add), new { id = cart.Id }, dto);
-        }
-
-
-        //////////////////Delete
-        [HttpDelete("{id}")]
-
-        public IActionResult Delete(int id)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized("User not authenticated");
-
-            var cart = cartRepo.GetById(id);
-            if (cart != null)
-            {
-                cart.DeletedBy = userId;
-                cartRepo.Remove(id);
-                cartRepo.Save();
-                return Content("Cart is deleted successfully");
-            }
-
-            return NotFound("Invalid Id");
-        }
+        //    return CreatedAtAction(nameof(Add), new { id = cart.Id }, dto);
+        //}
 
 
-        ////////////////////////////////update
+        //#endregion
 
-        [HttpPut("{id:int}")]
-        public IActionResult Update(int id, UpdateCartDTO cartFromReq)
-        {
-            var cart = cartRepo.GetById(id);
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        ////////////////////Delete
+        //[HttpDelete("{id}")]
 
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized("User not authenticated");
+        //public IActionResult Delete(int id)
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (cart != null)
-            {
-                cart.Quantity = cartFromReq.Quantity;
-                cart.ModifiedBy = userId;
+        //    if (string.IsNullOrEmpty(userId))
+        //        return Unauthorized("User not authenticated");
 
-                cartRepo.Update(id, cart);
-                cartRepo.Save();
-                return Content("Cart is updated successfully");
-            }
+        //    var cart = cartRepo.GetById(id);
+        //    if (cart != null)
+        //    {
+        //        cart.DeletedBy = userId;
+        //        cartRepo.Remove(id);
+        //        cartRepo.Save();
+        //        return Content("Cart is deleted successfully");
+        //    }
 
-            return NotFound("Invalid Id");
-        }
+        //    return NotFound("Invalid Id");
+        //}
+
+
+        //////////////////////////////////update
+
+        //[HttpPut("{id:int}")]
+        //public IActionResult Update(int id, UpdateCartDTO cartFromReq)
+        //{
+        //    var cart = cartRepo.GetById(id);
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //    if (string.IsNullOrEmpty(userId))
+        //        return Unauthorized("User not authenticated");
+
+        //    if (cart != null)
+        //    {
+        //        cart.Quantity = cartFromReq.Quantity;
+        //        cart.ModifiedBy = userId;
+
+        //        cartRepo.Update(id, cart);
+        //        cartRepo.Save();
+        //        return Content("Cart is updated successfully");
+        //    }
+
+        //    return NotFound("Invalid Id");
+        //}
 
 
     }

@@ -203,6 +203,7 @@ namespace HandmadeMarket.Services
             {
                 _productRepo.Add(product);
                 _productRepo.Save();
+                //update image 1
                 var request = _httpContextAccessor.HttpContext?.Request;
 
                 Product product1 = _productRepo.GetById(product.ProductId);
@@ -214,6 +215,7 @@ namespace HandmadeMarket.Services
                     Description = product1.Description,
                     Price = product1.Price,
                     Stock = product1.Stock,
+                    //update image 2
                     Image = string.IsNullOrEmpty(product1.Image) ? null : $"{request.Scheme}://{request.Host}{product.Image}",
 
                     PriceAfterSale = product1.PriceAfterSale,

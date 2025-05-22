@@ -7,6 +7,7 @@ namespace HandmadeMarket.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class CartController : ControllerBase
     {
       private   ICartRepo cartRepo { get; set; }
@@ -69,31 +70,48 @@ namespace HandmadeMarket.Controllers
         [HttpDelete]
         public IActionResult Delete(int id)
         {
-            Cart cart = cartRepo.GetById(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User not authenticated");
+
+            var cart = cartRepo.GetById(id);
             if (cart != null)
             {
+                cart.DeletedBy = userId;
                 cartRepo.Remove(id);
                 cartRepo.Save();
-                return Content("Cart is deleted sucessfully");
+                return Content("Cart is deleted successfully");
             }
+
             return NotFound("Invalid Id");
         }
+
 
         ////////////////////////////////update
-        
-        [HttpPut("{id:int}")]
-        public IActionResult Update(int id,UpdateCartDTO cartFromReq) {
-            Cart cart1 = cartRepo.GetById(id);
-            if (cart1 != null)
-            {
-                cart1.Quantity = cartFromReq.Quantity;
-                cartRepo.Update(id,cart1);
-                cartRepo.Save();
-                return Content("Cart is updated sucessfully");
-            }
-            return NotFound("Invalid Id");
 
+        [HttpPut("{id:int}")]
+        public IActionResult Update(int id, UpdateCartDTO cartFromReq)
+        {
+            var cart = cartRepo.GetById(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User not authenticated");
+
+            if (cart != null)
+            {
+                cart.Quantity = cartFromReq.Quantity;
+                cart.ModifiedBy = userId;
+
+                cartRepo.Update(id, cart);
+                cartRepo.Save();
+                return Content("Cart is updated successfully");
+            }
+
+            return NotFound("Invalid Id");
         }
-        
+
+
     }
 }

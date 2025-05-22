@@ -5,6 +5,8 @@
         [Key]
   
         public int Id { get; set; }
+        public string? ModifiedBy { get; set; }
+        public string? DeletedBy { get; set; }
         public int Quantity { get; set; }
         [ForeignKey("Customer")]
         public string CustomerId { get; set; }

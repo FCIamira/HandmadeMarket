@@ -227,7 +227,7 @@ namespace HandmadeMarket.Controllers
         #region Edit product
        
         [HttpPut("{id}")]
-        public IActionResult EditProduct(int id, [FromForm] AddProductDTO productDto)
+        public IActionResult EditProduct(int id, [FromBody] AddProductDTO productDto)
         {
             if (!ModelState.IsValid)
             {

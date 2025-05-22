@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using HandmadeMarket.Context;
+using HandmadeMarket.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -15,14 +17,27 @@ namespace HandmadeMarket.Controllers
             this.cartRepo = cartRepo;
         }
         [HttpGet]
-        public IActionResult GetAll () { 
-            List<CartWithProductDTO> carts = cartRepo.CategoryDTO().ToList();
-            if (carts != null) {
+        public IActionResult GetAll()
+        {
+            IEnumerable<Cart> carts = cartRepo.GetAll();
 
-                return Ok(carts);
-            }
-            return NotFound();
+            if (carts == null || !carts.Any())
+                return NotFound("No carts found");
+
+            var cartsDto = carts.Select(c => new CartGetAll
+            {
+                Id = c.Id,
+                ProductId = c.ProductId,
+                ProductName = c.Product.Name,
+                Quantity = c.Quantity,
+                Price = c.Product.Price,
+                Stock=c.Product.Stock,
+                Image = string.IsNullOrEmpty(c.Product.Image) ? null : $"{Request.Scheme}://{Request.Host}{c.Product.Image}"
+            }).ToList();
+
+            return Ok(cartsDto);
         }
+
         [HttpGet("{id:int}")]
         public IActionResult GetById(int id)
         {
@@ -35,7 +50,6 @@ namespace HandmadeMarket.Controllers
             return NotFound("Invalid Id");
         }
         [HttpPost]
-        [Authorize]
         public IActionResult Add([FromBody] CartWithProductDTO dto)
         {
             if (!ModelState.IsValid)
@@ -67,7 +81,8 @@ namespace HandmadeMarket.Controllers
 
 
         //////////////////Delete
-        [HttpDelete]
+        [HttpDelete("{id}")]
+
         public IActionResult Delete(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

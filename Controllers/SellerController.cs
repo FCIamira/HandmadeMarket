@@ -1,4 +1,6 @@
-﻿using HandmadeMarket.Models;
+﻿using HandmadeMarket.DTO;
+using HandmadeMarket.Models;
+using HandmadeMarket.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,297 +11,135 @@ namespace HandmadeMarket.Controllers
     public class SellerController : ControllerBase
     {
         private readonly ISellerRepo sellerRepo;
+        private readonly SellerServices sellerService;
 
-        public SellerController(ISellerRepo sellerRepo)
+        public SellerController(ISellerRepo sellerRepo,SellerServices sellerService)
         {
             this.sellerRepo = sellerRepo;
+            this.sellerService = sellerService;
         }
+
+
+        #region GetAllSellers
         [HttpGet]
         public IActionResult GetAllSellersWithProducts()
         {
-            var sellers = sellerRepo.GetAllSellersWithProducts();
-
-            if (sellers == null || !sellers.Any())
+            var result = sellerService.GetAllSellers();
+            if (result.IsSuccess)
             {
-                return NotFound("No sellers found");
+                return Ok(result);
             }
+            return BadRequest(result);
 
-            var sellerDtos = sellers.Select(s => new SellerWithProductsDTO
-            {
-                sellerId = s.UserId,
-                storeName = s.storeName,
-                email = s.email,
-                phoneNumber = s.phoneNumber,
-                createdAt = s.createdAt,
-                Products = s.Products?.Select(p => new ProductDTO
-                {
-                    Name = p.Name,
-                    Description = p.Description,
-                    Price = p.Price
-                }).ToList() ?? new List<ProductDTO>()
-            }).ToList();
-
-            return Ok(sellerDtos);
         }
 
+        #endregion
 
+        #region GetSellerById
         [HttpGet("{id}")]
         public IActionResult GetSellerById(string id)
         {
-            Seller seller = sellerRepo.GetSellerWithProductsById(id);
-            if (seller == null)
+            var result = sellerService.GetSellerById(id);
+            if (result.IsSuccess)
             {
-                return NotFound("Seller not found");
+                return Ok(result);
             }
-            else
-            {
-                SellerWithProductsDTO sellerWithProductsDTO = new SellerWithProductsDTO
-                {
-                    sellerId = seller.UserId,
-                    storeName = seller.storeName,
-                    email = seller.email,
-                    phoneNumber = seller.phoneNumber,
-                    createdAt = seller.createdAt,
-                    Products = seller.Products?.Select(p => new ProductDTO
-                    {
-                        ProductId = p.ProductId,
-                        Name = p.Name,
-                        Description = p.Description,
-                        Price = p.Price,
-                        Image = p.Image,
-                        Stock = p.Stock,
-                    }).ToList() ?? new List<ProductDTO>()
-                };
-                return Ok(sellerWithProductsDTO);
-            }
+            return BadRequest(result);
         }
 
+        #endregion
 
+
+        #region GetSellerByStoreName
         [HttpGet("{storeName:alpha}")]
         public IActionResult GetSellerByStoreName(string storeName)
         {
-            Seller seller = sellerRepo.GetSellerWithProductsByStoreName(storeName);
-            if (seller == null)
+            var result = sellerService.GetSellerByStoreName(storeName);
+            if (result.IsSuccess)
             {
-                return NotFound("Seller not found");
+                return Ok(result);
             }
-            else
-            {
-                SellerWithProductsDTO sellerDTO = new SellerWithProductsDTO
-                {
-                    sellerId = seller.UserId,
-                    storeName = seller.storeName,
-                    email = seller.email,
-                    phoneNumber = seller.phoneNumber,
-                    Products = seller.Products?.Select(p => new ProductDTO
-                    {
-                        Name = p.Name,
-                        Description = p.Description,
-                        Price = p.Price
-                    }).ToList() ?? new List<ProductDTO>()
-                };
-                return Ok(sellerDTO);
-            }
+            return BadRequest(result);
+
         }
+        #endregion
 
 
+        #region GetSellerByProductId
         [HttpGet("product/{id:int}")]
         public IActionResult GetSellerByProductId(int id)
         {
-            Seller seller = sellerRepo.GetSellerByProductId(id);
-
-            if (seller == null)
+            var result = sellerService.GetSellerByProductId(id);
+            if (result.IsSuccess)
             {
-                return NotFound("Seller not found");
+                return Ok(result);
             }
-            else
-            {
-                SellerDTO sellerDTO = new SellerDTO
-                {
-                    sellerId = seller.UserId,
-                    storeName = seller.storeName,
-                    email = seller.email,
-                    phoneNumber = seller.phoneNumber
-                };
-                return Ok(sellerDTO);
+            return BadRequest(result);
 
-            }
         }
 
+        #endregion
 
-        [HttpPost]
-        public IActionResult AddSeller(SellerDTO sellerDTO)
-        {
-            Seller seller = new Seller
-            {
-                UserId = sellerDTO.sellerId,
-                storeName = sellerDTO.storeName,
-                email = sellerDTO.email,
-                phoneNumber = sellerDTO.phoneNumber,
-                createdAt = DateTime.Now
-            };
-            if (ModelState.IsValid)
-            {
-                sellerRepo.Add(seller);
-                sellerRepo.Save();
-                return CreatedAtAction("GetSellerById", new { id = sellerDTO.sellerId }, sellerDTO);
-            }
-            return BadRequest(ModelState);
-        }
-
-
-
-        [HttpPut("{id}")]
-        public IActionResult EditSeller(string id, SellerDTO sellerDTO)
-        {
-            if (ModelState.IsValid)
-            {
-                Seller seller = sellerRepo.GetSellerById(id);
-                if (seller == null)
-                {
-                    return NotFound("Seller not found");
-                }
-                else
-                {
-                    SellerWithProductsDTO sellerWithProductsDTO = new SellerWithProductsDTO
-                    {
-                        sellerId = seller.UserId,
-                        storeName = seller.storeName,
-                        email = seller.email,
-                        phoneNumber = seller.phoneNumber,
-                        createdAt = seller.createdAt,
-                        Products = seller.Products?.Select(p => new ProductDTO
-                        {
-                            Name = p.Name,
-                            Description = p.Description,
-                            Price = p.Price,
-                            Image = string.IsNullOrEmpty(p.Image) ? null : $"{Request.Scheme}://{Request.Host}{p.Image}",
-
-                        }).ToList() ?? new List<ProductDTO>()
-                    };
-
-                    return Ok(sellerWithProductsDTO);
-                }
-            }
-            return BadRequest(ModelState);
-        }
-
-
-        // Repeated code bacause merge
-        //[HttpGet("{storeName:alpha}")]
-        //public IActionResult GetSellerByStoreName(string storeName)
-        //{
-        //    Seller seller = sellerRepo.GetSellerWithProductsByStoreName(storeName);
-        //    if (seller == null)
-        //    {
-        //        return NotFound("Seller not found");
-        //    }
-        //    else
-        //    {
-        //        SellerWithProductsDTO sellerDTO = new SellerWithProductsDTO
-        //        {
-        //            sellerId = seller.UserId,
-        //            storeName = seller.storeName,
-        //            email = seller.email,
-        //            phoneNumber = seller.phoneNumber,
-        //            Products = seller.Products?.Select(p => new ProductDTO
-        //            {
-        //                Name = p.Name,
-        //                Description = p.Description,
-        //                Price = p.Price
-        //            }).ToList() ?? new List<ProductDTO>()
-        //        };
-        //        return Ok(sellerDTO);
-        //    }
-        //}
-
-        //[HttpGet("product/{id:int}")]
-
-        //public IActionResult GetSellerByProductId(int id)
-        //{
-        //    Seller seller = sellerRepo.GetSellerByProductId(id);
-
-        //    if (seller == null)
-        //    {
-        //        return NotFound("Seller not found");
-        //    }
-        //    else
-        //    {
-        //        SellerDTO sellerDTO = new SellerDTO
-        //        {
-        //            sellerId = seller.UserId,
-        //            storeName = seller.storeName,
-        //            email = seller.email,
-        //            phoneNumber = seller.phoneNumber
-        //        };
-        //        return Ok(sellerDTO);
-
-        //    }
-        //}
-
-
+        #region AddSeller
+        //
         //[HttpPost]
         //public IActionResult AddSeller(SellerDTO sellerDTO)
         //{
-        //    Seller seller = new Seller
-        //    {
-        //        UserId = sellerDTO.sellerId,
-        //        storeName = sellerDTO.storeName,
-        //        email = sellerDTO.email,
-        //        phoneNumber = sellerDTO.phoneNumber,
-        //        createdAt = DateTime.Now
-        //    };
+        //    var result = sellerService.AddSeller(sellerDTO);
+
         //    if (ModelState.IsValid)
         //    {
-        //        sellerRepo.Add(seller);
-        //        sellerRepo.Save();
-        //        return CreatedAtAction("GetSellerById", new { id = sellerDTO.sellerId }, sellerDTO);
-        //    }
-        //    return BadRequest(ModelState);
-        //}
+        //        if (result.IsSuccess)
+        //        { return Ok(result); }
 
-
-
-        //[HttpPut("{id:int}")]
-        //public IActionResult EditSeller(int id, SellerDTO sellerDTO)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        Seller seller = sellerRepo.GetById(id);
-        //        if (seller == null)
+        //        else
         //        {
-        //            return NotFound("Seller not found");
+        //            return BadRequest(result);
         //        }
-
-        //        seller.storeName = sellerDTO.storeName;
-        //        seller.email = sellerDTO.email;
-        //        seller.phoneNumber = sellerDTO.phoneNumber;
-
-        //        sellerRepo.Update(id, seller);
-        //        sellerRepo.Save();
-        //        return Ok(seller);
         //    }
+
         //    return BadRequest(ModelState);
+
         //}
+        //
+        #endregion
 
-
-        [HttpDelete("{id:int}")]
-        public IActionResult DeleteSellerWithProductsById(string id)
+        #region EditSeller
+        [HttpPut("{id}")]
+        public IActionResult EditSeller(string id, SellerDTO sellerDTO)
         {
-            Seller seller = sellerRepo.GetSellerById(id);
+            var result = sellerService.EditSeller(id, sellerDTO);
+
             if (ModelState.IsValid)
             {
-                if (seller == null)
-                {
-                    return NotFound("Seller not found");
-                }
+                if (result.IsSuccess)
+                { return Ok(result); }
 
-                sellerRepo.DeleteSellerWithProductsById(id);
-                sellerRepo.Save();
-                return Ok(seller);
+                else
+                {
+                    return BadRequest(result);
+                }
             }
+
             return BadRequest(ModelState);
+
         }
+        #endregion
+
+        #region DeleteSeller
+        [HttpDelete("{id}")]
+        public IActionResult DeleteSellerWithProductsById(string id)
+        {
+            var result = sellerService.DeleteSellerWithProductsById(id);
+
+            if (!result.IsSuccess)
+                return NotFound();
+
+            return Ok();
+        } 
+        #endregion
+
+
 
 
     }

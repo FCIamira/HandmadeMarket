@@ -181,6 +181,7 @@ namespace HandmadeMarket.Services
                 return Result<Product>.Failure("Unauthorized: User ID not found.");
             }
 
+
             Product product = new Product()
             {
                 Description = productDTO.Description,

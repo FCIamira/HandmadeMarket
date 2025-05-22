@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using HandmadeMarket.DTO;
+using HandmadeMarket.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,33 +10,23 @@ namespace HandmadeMarket.Controllers
     [ApiController]
     public class OrderController : ControllerBase
     {
-        private readonly IOrderRepo orderRepo;
-        private readonly IProductRepo productRepo;
+        private readonly OrderServices orderServices;
 
-        public OrderController(IOrderRepo orderRepo,IProductRepo productRepo)
+        public OrderController(OrderServices orderServices)
         {
-            this.orderRepo = orderRepo;
-            this.productRepo = productRepo;
+            this.orderServices = orderServices;
         }
 
         #region Get All
         [HttpGet]
         public IActionResult GetAll()
         {
-            IEnumerable<Order> orders = orderRepo.GetAll();
-            List<FlatOrder_OrderItems> orderDTO = orders.SelectMany
-                (order => order.Order_Items.Select(oi => new FlatOrder_OrderItems
-                {
-
-                    Order_Date = order.Order_Date,
-                    Total_Price = orderRepo.CalcTotalPrice(oi.Price, oi.Quantity),
-                    CustomerName = order.Customer.FirstName,
-                    PricePerItem = oi.Price,
-                    Quantity = oi.Quantity,
-                    ProductName = oi.Product.Name,
-                })).ToList();
-
-            return Ok(orderDTO);
+            Result<List<FlatOrder_OrderItems>> result = orderServices.GetAll();
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
         }
         #endregion
 
@@ -42,130 +34,40 @@ namespace HandmadeMarket.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            Order order = orderRepo.GetById(id);
-            if (order == null)
+            Result<FlatOrder_OrderItems> result = orderServices.GetById(id);
+            if (result.IsSuccess)
             {
-                return NotFound();
+                return Ok(result);
             }
-            else
-            {
-
-                FlatOrder_OrderItems FlatOrder = order.Order_Items.Select(oi => new FlatOrder_OrderItems
-                {
-                    Order_Date = order.Order_Date,
-                    Total_Price = order.Total_Price,
-                    CustomerName = order.Customer.FirstName,
-                    PricePerItem = oi.Price,
-                    Quantity = oi.Quantity,
-                    ProductName = oi.Product.Name,
-                }).FirstOrDefault();
-
-
-                return Ok(FlatOrder);
-            }
-
-
-        } 
+            return BadRequest(result);
+        }
         #endregion
 
         #region Create Order
         [HttpPost]
-
         public IActionResult CreateOrder(AddOrderDTO orderDto)
         {
-            if (orderDto == null || orderDto.Items == null || !orderDto.Items.Any())
+
+            Result<string> result = orderServices.CreateOrder(orderDto);
+            if (result.IsSuccess)
             {
-                return BadRequest();
+                return Ok(result);
             }
-
-            // Get all product IDs from the order
-            var productIds = orderDto.Items.Select(i => i.ProductId).ToList();
-
-            // Get all products from the database in one go
-            var products = productRepo.GetAll()
-                            .Where(p => productIds.Contains(p.ProductId))
-                            .ToDictionary(p => p.ProductId, p => p.Price);
-
-            // If any product is not found
-            if (products.Count != productIds.Count)
-            {
-                return NotFound("One or more products not found.");
-            }
-
-            // Build the order
-            var orderItems = orderDto.Items.Select(oi => new OrderItem
-            {
-                ProductId = oi.ProductId,
-                Quantity = oi.Quantity,
-                Price = products[oi.ProductId] // Real price from DB
-            }).ToList();
-
-            var order = new Order
-            {
-                Order_Date = DateTime.Now,
-                CustomerId = orderDto.CustomerID,
-                ShipmentId = orderDto.ShipmentId,
-                Order_Items = orderItems,
-                Total_Price = orderItems.Sum(oi => oi.Price * oi.Quantity)
-            };
-
-            orderRepo.Add(order);
-            orderRepo.Save();
-
-            return Ok("Created");
+            return BadRequest(result);
         }
         #endregion
 
         #region Update Order
+
         [HttpPut("{id}")]
         public IActionResult UpdateOrder(int id, AddOrderDTO orderDto)
         {
-            if (orderDto == null || orderDto.Items == null || !orderDto.Items.Any())
+            Result<string> result = orderServices.UpdateOrder(id,orderDto);
+            if (result.IsSuccess)
             {
-                return BadRequest();
+                return Ok(result);
             }
-
-            // Get the existing order from the DB
-            var existingOrder = orderRepo.GetById(id);
-            if (existingOrder == null)
-            {
-                return NotFound("Order not found.");
-            }
-
-            // Get all product IDs from the order
-            var productIds = orderDto.Items.Select(i => i.ProductId).ToList();
-
-            // Get actual product prices from the database
-            var products = productRepo.GetAll()
-                            .Where(p => productIds.Contains(p.ProductId))
-                            .ToDictionary(p => p.ProductId, p => p.Price);
-
-            if (products.Count != productIds.Count)
-            {
-                return NotFound("One or more products not found.");
-            }
-
-            // Update order fields
-            existingOrder.CustomerId = orderDto.CustomerID;
-            existingOrder.ShipmentId = orderDto.ShipmentId;
-            existingOrder.Order_Date = DateTime.Now;
-
-            // Recreate order items
-            existingOrder.Order_Items = orderDto.Items.Select(oi => new OrderItem
-            {
-                ProductId = oi.ProductId,
-                Quantity = oi.Quantity,
-                Price = products[oi.ProductId]
-            }).ToList();
-
-            // Recalculate total price
-            existingOrder.Total_Price = existingOrder.Order_Items.Sum(oi => oi.Price * oi.Quantity);
-
-            // Save changes
-            orderRepo.Update(id, existingOrder);
-            orderRepo.Save();
-
-            return Ok("Updated");
+            return BadRequest(result);
         }
 
 
@@ -175,14 +77,12 @@ namespace HandmadeMarket.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteOrder(int id)
         {
-            var order = orderRepo.GetById(id);
-            if (order == null)
+            Result<string> result = orderServices.DeleteOrder(id);
+            if (result.IsSuccess)
             {
-                return NotFound("Order not found.");
+                return Ok(result);
             }
-            orderRepo.Remove(id);
-            orderRepo.Save();
-            return Ok("Deleted");
+            return BadRequest(result);
         }
         #endregion
 

@@ -1,4 +1,6 @@
-﻿using HandmadeMarket.Repository;
+﻿using HandmadeMarket.Models;
+using HandmadeMarket.Repository;
+using HandmadeMarket.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,27 +11,21 @@ namespace HandmadeMarket.Controllers
     [ApiController]
     public class OrderItemController : ControllerBase
     {
-        private readonly IOrderItemRepo orderItemRepo;
-        private readonly IProductRepo productRepo;
-        public OrderItemController(IOrderItemRepo orderItemRepo, IProductRepo productRepo)
+        private readonly OrderItemServices orderItemServices;
+        public OrderItemController(OrderItemServices orderItemServices)
         {
-            this.orderItemRepo = orderItemRepo;
-            this.productRepo = productRepo;
+            this.orderItemServices= orderItemServices;
         }
         #region Get OrderItems By OrderId
         [HttpGet]
         public IActionResult GetItemsRelatedToSpecificOrder(int orderId)
         {
-            IEnumerable<OrderItem> orderItems = orderItemRepo.GetOrderItemsByOrderId(orderId);
-            IEnumerable<ViewOrderItemDto> orderItemDTOs = orderItems.Select(o => new ViewOrderItemDto
+            Result<IEnumerable<ViewOrderItemDto>> result = orderItemServices.GetItemsRelatedToSpecificOrder(orderId);
+            if (result.IsSuccess)
             {
-                OrderItemId = o.OrderItemId,
-                OrderId = o.OrderId,
-                Quantity = o.Quantity,
-                PricePerItem = o.Price,
-                ProductName = o.Product.Name
-            });
-            return Ok(orderItemDTOs);
+                return Ok(result);
+            }
+            return BadRequest(result);
         }
         #endregion
 
@@ -37,58 +33,26 @@ namespace HandmadeMarket.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            OrderItem orderItem = orderItemRepo.GetById(id);
-            
-            if (orderItem == null)
+            Result<ViewOrderItemDto> result = orderItemServices.GetById(id);
+            if (result.IsSuccess)
             {
-                return NotFound();
+                return Ok(result);
             }
-            else
-            {
-                ViewOrderItemDto orderItemDTO = new ViewOrderItemDto
-                {
-                    OrderItemId = orderItem.OrderItemId,
-                    OrderId = orderItem.OrderId,
-                    Quantity = orderItem.Quantity,
-                    PricePerItem = orderItem.Price,
-                    ProductName = orderItem.Product.Name
-                };
-                return Ok(orderItemDTO);
-            }
+            return BadRequest(result);
         }
+        
         #endregion
 
         #region Create OrderItem
         [HttpPost]
         public IActionResult CreateOrderItem([FromBody] AddOrderItemDTO orderItem)
         {
-            if (orderItem == null)
+            Result<string> result = orderItemServices.CreateOrderItem(orderItem);
+            if (result.IsSuccess)
             {
-                return BadRequest("Order item is null");
+                return Ok(result);
             }
-            if (orderItem.Quantity <= 0)
-            {
-                return BadRequest("Quantity must be greater than 0");
-            }
-            Product product = productRepo.GetById(orderItem.ProductId);
-            if (product == null)
-            {
-                return NotFound("Product not found");
-            }
-            else {
-
-                OrderItem newOrderItem = new OrderItem
-                {
-                    OrderId = orderItem.OrderId,
-                    Quantity = orderItem.Quantity,
-                    Price = product.Price,
-                    ProductId = orderItem.ProductId
-                };
-                orderItemRepo.Add(newOrderItem);
-                orderItemRepo.Save();
-                return Ok("Created");
-            }
-          
+            return BadRequest(result);
         }
         #endregion
 
@@ -96,28 +60,12 @@ namespace HandmadeMarket.Controllers
         [HttpPut("{id}")]
         public IActionResult UpdateOrderItem(int id, [FromBody] AddOrderItemDTO orderItem)
         {
-            if (orderItem == null)
+            Result<string> result = orderItemServices.UpdateOrderItem(id,orderItem);
+            if (result.IsSuccess)
             {
-                return BadRequest("Order item is null");
+                return Ok(result);
             }
-            if (orderItem.Quantity <= 0)
-            {
-                return BadRequest("Quantity must be greater than 0");
-            }
-            OrderItem existingOrderItem = orderItemRepo.GetById(id);
-            Product product = productRepo.GetById(orderItem.ProductId);
-            if (existingOrderItem == null)
-            {
-                return NotFound("Order item not found");
-            }
-            else
-            {
-                existingOrderItem.Quantity = orderItem.Quantity;
-                existingOrderItem.Price = product.Price;
-                orderItemRepo.Update(id,existingOrderItem);
-                orderItemRepo.Save();
-                return Ok("Updated");
-            }
+            return BadRequest(result);
         }
         #endregion
 
@@ -125,17 +73,12 @@ namespace HandmadeMarket.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteOrderItem(int id)
         {
-            OrderItem orderItem = orderItemRepo.GetById(id);
-            if (orderItem == null)
+            Result<string> result = orderItemServices.DeleteOrderItem(id);
+            if (result.IsSuccess)
             {
-                return NotFound("Order item not found");
+                return Ok(result);
             }
-            else
-            {
-                orderItemRepo.Remove(id);
-                orderItemRepo.Save();
-                return Ok("Deleted");
-            }
+            return BadRequest(result);
         }
         #endregion
 
@@ -147,38 +90,13 @@ namespace HandmadeMarket.Controllers
        // [Authorize(Roles = "Seller")]
         public IActionResult GetAllBySellerId(int pageNumber = 1, int pageSize = 5)
         {
-            var sellerId = (User.FindFirst("Id")?.Value);
-            if (sellerId != null)
+            Result<List<OrderItemsWithOrderDetails>> result = orderItemServices.GetAllBySellerId(pageNumber,pageSize);
+            if (result.IsSuccess)
             {
-                IEnumerable<OrderItem> orders = orderItemRepo.GetAllBySellerId(sellerId, pageSize, pageNumber);
-                List<OrderItemsWithOrderDetails> DTO = new List<OrderItemsWithOrderDetails>();
-
-                foreach (OrderItem orderItem in orders)
-                {
-                    if (orderItem.Product != null && orderItem.Order?.Customer != null && orderItem.Order?.Shipment != null)
-                    {
-                        DTO.Add(new OrderItemsWithOrderDetails
-                        {
-                            ProductName = orderItem.Product.Name,
-                            Price = orderItem.Price,
-                            Quantity = orderItem.Quantity,
-                            CustomerAddress = orderItem.Order.Customer.Address,
-                            CustomerName = orderItem.Order.Customer.FirstName,
-                            ShipmentDate = orderItem.Order.Shipment.ShipmentDate
-                        });
-                    }
-                
-
-                }
-                return Ok(DTO);
-
+                return Ok(result);
             }
-            else
-            {
-                return NotFound("sell doesn't exist");
-            }
-           
-          
+            return BadRequest(result);
+
         }
         #endregion
 

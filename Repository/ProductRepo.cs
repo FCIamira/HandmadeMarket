@@ -19,7 +19,7 @@ namespace HandmadeMarket.Repository
 
         public decimal CalcPriceAfterSale(decimal price, decimal salePercentage)
         {
-           decimal priceAfterSale = price - (price * salePercentage);
+            decimal priceAfterSale = price - (price * (salePercentage / 100));
             return priceAfterSale;
         }
 
@@ -34,84 +34,21 @@ namespace HandmadeMarket.Repository
                 .FirstOrDefault(p => p.ProductId == id);
             context.Products.Remove(product);
         }
-
-
-
-        //public void EditProduct(int id, AddProductDTO product)
-        //{
-        //    Product? p = context.Products
-        //        .Where(p => p.ProductId == id)
-        //        .FirstOrDefault();
-
-        //    p.Description = product.Description;
-        //    p.Name = product.Name;
-        //    p.Price = product.Price;
-        //    p.Stock = product.Stock;
-
-        //    if (product.Image != null && product.Image.Length > 0)
-        //    {
-        //        string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-        //        if (!Directory.Exists(uploadsFolder))
-        //        {
-        //            Directory.CreateDirectory(uploadsFolder);
-        //        }
-
-        //        string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(product.Image.FileName);
-        //        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        //        using (var stream = new FileStream(filePath, FileMode.Create))
-        //        {
-        //             product.Image.CopyToAsync(stream);
-        //        }
-
-        //        p.Image = "/uploads/" + uniqueFileName;
-        //    }
-
-        //    p.Image = product.Image;
-        //    p.categoryId = product.categoryId;
-        //    p.sellerId = product.sellerId;
-
-        //    context.Update(p);
-        //     context.SaveChangesAsync();
-
-        //}
-
-        public void EditProduct(int id, AddProductDTO product, string userId)
+        public void EditProduct(int id, AddProductDTO dto, string userId)
         {
-            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var existingProduct = context.Products.Find(id);
+            if (existingProduct == null) return;
 
-            Product? p = context.Products.FirstOrDefault(p => p.ProductId == id);
-            if (p == null) return;
+           
+            existingProduct.Name = dto.Name;
+            existingProduct.Description = dto.Description;
+            existingProduct.Price = dto.Price;
+            existingProduct.Stock = dto.Stock;
+            existingProduct.SalePercentage = dto.SalePercentage;
 
-            p.Description = product.Description;
-            p.Name = product.Name;
-            p.Price = product.Price;
-            p.Stock = product.Stock;
-            p.categoryId = product.categoryId;
-            p.sellerId = userId;
-
-            if (product.Image != null && product.Image.Length > 0)
-            {
-                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-
-                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(product.Image.FileName);
-                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                     product.Image.CopyToAsync(stream);
-                }
-
-                p.Image = "/uploads/" + uniqueFileName;
-            }
-
-            context.Update(p);
-             context.SaveChangesAsync();
+            context.Products.Update(existingProduct); 
         }
+
 
         public IEnumerable<Product> GetAll()
         {
@@ -120,20 +57,19 @@ namespace HandmadeMarket.Repository
 
         }         
 
-        public ProductDTO GetProductById(int id)
+        public Product GetProductById(int id)
         {
-            ProductDTO? productDTO = context.Products
-                .Where(p => p.ProductId == id)
-                .Select( p => new ProductDTO
-                {
-                    ProductId = p.ProductId,
-                    Description = p.Description,
-                    Name = p.Name,
-                    Price = p.Price,
-                    Stock = p.Stock,
-                    Image = p.Image
-                }).FirstOrDefault();
-            return productDTO;
+            Product product = context.Products.FirstOrDefault(Product => Product.ProductId == id);
+                //.Select( p => new ProductDTO
+                //{
+                //    ProductId = p.ProductId,
+                //    Description = p.Description,
+                //    Name = p.Name,
+                //    Price = p.Price,
+                //    Stock = p.Stock,
+                //    Image = p.Image
+                //}).FirstOrDefault();
+            return product;
         }
 
         public Product GetProductByName(string name)

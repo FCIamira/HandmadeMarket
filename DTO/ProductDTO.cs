@@ -10,7 +10,7 @@
         public string? Image { get; set; }
         public decimal? SalePercentage { get; set; }
         public decimal? PriceAfterSale { get; set; }
-
+        public int CategoryId { get; set; }
 
     }
 }

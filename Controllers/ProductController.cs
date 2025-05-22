@@ -68,10 +68,8 @@ namespace HandmadeMarket.Controllers
         public IActionResult GetAllProductsHaveSale()
         {
             IEnumerable<Product> products = productRepo.GetProductsHaveSale();
-            var productsWithSale = products
-       .Where(p => p.SalePercentage > 0 && p.PriceAfterSale < p.Price)
-       .ToList();
-            List<ProductDTO> productDTO = productsWithSale.Select(products => new ProductDTO
+      
+            List<ProductDTO> productDTO = products.Select(products => new ProductDTO
             {
                 ProductId = products.ProductId,
                 Name = products.Name,
@@ -184,8 +182,6 @@ namespace HandmadeMarket.Controllers
 
             Product product = new Product()
             {
-
-
                 Description = productDTO.Description,
                 Name = productDTO.Name,
                 Price = productDTO.Price,
@@ -229,45 +225,7 @@ namespace HandmadeMarket.Controllers
 
 
         #region Edit product
-        //[HttpPut("{id}")]
-        //    public IActionResult EditProduct(int id, Product product)
-        //    {
-        //        if (!ModelState.IsValid)
-        //        {
-        //            return BadRequest(ModelState);
-        //        }
-
-        //        Product existingProduct = productRepo.GetById(id);
-        //        if (existingProduct == null)
-        //        {
-        //            return NotFound("Product not found");
-        //        }
-        //        string userId =
-        //        existingProduct.Description = product.Description;
-        //        existingProduct.Name = product.Name;
-        //        existingProduct.Price = product.Price;
-        //        existingProduct.Stock = product.Stock;
-        //        existingProduct.Image = product.Image;
-        //        existingProduct.categoryId = product.categoryId;
-        //        existingProduct.sellerId = product.sellerId;
-
-        //        productRepo.EditProduct(id, existingProduct,userId);
-        //        productRepo.Save();
-
-        //        var productDTO = new ProductDTO
-        //        {
-        //            ProductId = existingProduct.ProductId,
-        //            Name = existingProduct.Name,
-        //            Description = existingProduct.Description,
-        //            Price = existingProduct.Price,
-        //            Stock = existingProduct.Stock,
-        //            Image = string.IsNullOrEmpty(existingProduct.Image) ? null : $"{Request.Scheme}://{Request.Host}{existingProduct.Image}",
-        //            SalePercentage = existingProduct.SalePercentage ?? 0,
-        //            PriceAfterSale = existingProduct.PriceAfterSale > 0 ? existingProduct.PriceAfterSale : existingProduct.Price
-        //        };
-
-        //        return Ok(productDTO);
-        //    }
+       
         [HttpPut("{id}")]
         public IActionResult EditProduct(int id, [FromForm] AddProductDTO productDto)
         {
@@ -276,7 +234,7 @@ namespace HandmadeMarket.Controllers
                 return BadRequest(ModelState);
             }
 
-            Product existingProduct = productRepo.GetById(id);
+            Product existingProduct = productRepo.GetProductById(id);
             if (existingProduct == null)
             {
                 return NotFound("Product not found");
@@ -287,18 +245,21 @@ namespace HandmadeMarket.Controllers
             productRepo.EditProduct(id, productDto, userId);
             productRepo.Save();
 
-            var updatedProduct = productRepo.GetById(id);
+            Product updatedProduct = productRepo.GetProductById(id);
 
             var productDTO = new ProductDTO
             {
                 ProductId = updatedProduct.ProductId,
+                CategoryId= updatedProduct.categoryId,
                 Name = updatedProduct.Name,
                 Description = updatedProduct.Description,
                 Price = updatedProduct.Price,
                 Stock = updatedProduct.Stock,
+
                 Image = string.IsNullOrEmpty(updatedProduct.Image) ? null : $"{Request.Scheme}://{Request.Host}{updatedProduct.Image}",
                 SalePercentage = updatedProduct.SalePercentage ?? 0,
                 PriceAfterSale = updatedProduct.PriceAfterSale > 0 ? updatedProduct.PriceAfterSale : updatedProduct.Price
+          
             };
 
             return Ok(productDTO);

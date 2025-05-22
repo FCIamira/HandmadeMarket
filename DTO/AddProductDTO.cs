@@ -14,6 +14,7 @@ namespace HandmadeMarket.DTO
        // public string sellerId { get; set; }
         public bool HasSale { get; set; }
         public decimal SalePercentage { get; set; }
+       
 
     }
 }

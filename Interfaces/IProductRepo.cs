@@ -9,7 +9,7 @@
         Task<IEnumerable<TopProductsDTO>> GetTopProductsByHighestNumberOfOrder();
 
 
-        ProductDTO GetProductById(int id);
+        Product GetProductById(int id);
         void EditProduct(int id, AddProductDTO product,string userId);
         void DeleteProduct(int id);
 

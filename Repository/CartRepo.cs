@@ -23,5 +23,11 @@
             ).ToList();
             return carts;
         }
+        public override IEnumerable<Cart> GetAll()
+        {
+            return handmadeContext.Carts.Include(c => c.Product).ToList();
+        }
+
+
     }
 }

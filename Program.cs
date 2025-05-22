@@ -29,6 +29,9 @@ namespace HandmadeMarket
             builder.Services.AddScoped<CartServices>();
             builder.Services.AddScoped<RatingServices>();
             builder.Services.AddScoped<SellerServices>();
+            builder.Services.AddScoped<OrderServices>();
+            builder.Services.AddScoped<OrderItemServices>();
+
 
 
 

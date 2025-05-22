@@ -14,12 +14,11 @@ namespace HandmadeMarket.Repository
 
 
 
-        public IEnumerable<Category> GetAllCategoriesWithProducts()
+        public IQueryable<Category> GetAllCategoriesWithProducts()
         {
 
             return handmadeContext.Categories
-                .Include(c => c.Products)
-                .ToList();
+                .Include(c => c.Products);
         }
 
         public Category GetCategoryByName(string name)

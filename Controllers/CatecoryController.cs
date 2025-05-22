@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HandmadeMarket.Services;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HandmadeMarket.Controllers
@@ -8,107 +10,44 @@ namespace HandmadeMarket.Controllers
     public class CatecoryController : ControllerBase
     {
         ICategoryRepo categoryRepo;
-        public CatecoryController(ICategoryRepo categoryRepo)
+        CategoryServices categoryServices;
+        public CatecoryController(ICategoryRepo categoryRepo, CategoryServices categoryServices)
         {
             this.categoryRepo = categoryRepo;
+            this.categoryServices = categoryServices;
         }
         [HttpGet]
         public IActionResult GetAll()
         {
-            IEnumerable<Category> categories = categoryRepo.GetAllCategoriesWithProducts();
-            if (categories == null || !categories.Any())
+            Result<List<CategoryWithProductDTO>> result = categoryServices.GetAllCategoriesWithProducts();
+            if (result.IsSuccess)
             {
-                return NotFound("No categories found.");
+                return Ok(result);
             }
-
-            var categoryDTOs = categories.Select(c => new CategoryWithProductDTO
-            {
-                categoryId = c.categoryId,
-                name = c.name,
-                Products = c.Products.Select(p => new ProductDTO
-                {
-                    Name = p.Name,
-                    Price = p.Price,
-                    Description = p.Description,
-                    ProductId = p.ProductId,
-                    Stock = p.Stock,
-                    Image = p.Image,
-                    PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
-                    SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
-                }).ToList() ?? new List<ProductDTO>()
-            }).ToList();
-
-            return Ok(categoryDTOs);
+            return BadRequest(result);
         }
 
-        //[HttpGet("{id:int}")]
-        //public IActionResult GetCatecoryById(int id)
-        //{
-        //    Category category = categoryRepo.GetById(id);
-        //    if (category == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok(category);
-        //}
         [HttpGet("{id:int}")]
         public IActionResult GetById(int id)
         {
-            Category category = categoryRepo.GetCategoryDTOById(id);
-            if (category == null)
+            Result<CategoryWithProductDTO> result = categoryServices.GetById(id);
+            if (result.IsSuccess)
             {
-                return NotFound();
+                return Ok(result);
             }
-            else
-            {
-                CategoryWithProductDTO categoryDTO = new CategoryWithProductDTO
-                {
-                    categoryId = category.categoryId,
-                    name = category.name,
-                    Products = category.Products.Select(p => new ProductDTO
-                    {
-                        Name = p.Name,
-                        Price = p.Price,
-                        Description = p.Description,
-                        ProductId = p.ProductId,
-                        Stock = p.Stock,
-                        Image = p.Image,
-                        PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
-                        SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
-                    }).ToList() ?? new List<ProductDTO>()
-                };
-                return Ok(categoryDTO);
-            }
+            return BadRequest(result);
         }
         [HttpGet("{CategoryName:alpha}")]
         public IActionResult GetCategoryByName(string CategoryName)
         {
-            Category category = categoryRepo.GetCategoryByName(CategoryName);
-            if (category == null)
+            Result<CategoryWithProductDTO> result = categoryServices.GetCategoryByName(CategoryName);
+            if (result.IsSuccess)
             {
-                return NotFound();
+                return Ok(result);
             }
-            else
-            {
-                CategoryWithProductDTO categoryDTO = new CategoryWithProductDTO
-                {
-                    categoryId = category.categoryId,
-                    name = category.name,
-                    Products = category.Products.Select(p => new ProductDTO
-                    {
-                        Name = p.Name,
-                        Price = p.Price,
-                        Description = p.Description,
-                        ProductId = p.ProductId,
-                        Stock = p.Stock,
-                        Image = p.Image,
-                        PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
-                        SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
-                    }).ToList() ?? new List<ProductDTO>()
-                };
-                return Ok(categoryDTO);
-            }
+            return BadRequest(result);
         }
+
         [HttpPost]
         public IActionResult AddCategory(CategoryDTO categoryDto)
         {

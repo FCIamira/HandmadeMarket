@@ -15,6 +15,7 @@ namespace HandmadeMarket.Services
         {
             this.categoryRepo = categoryRepo;
         }
+        #region GetAllCategoriesWithProducts
         public Result<List<CategoryWithProductDTO>> GetAllCategoriesWithProducts()
         {
             IEnumerable<Category> categories = categoryRepo.GetAllCategoriesWithProducts();
@@ -42,6 +43,9 @@ namespace HandmadeMarket.Services
             return Result<List<CategoryWithProductDTO>>.Success(categoryDTOs);
         }
 
+        #endregion
+
+        #region GetById
         public Result<CategoryWithProductDTO> GetById(int id)
         {
             Category category = categoryRepo.GetCategoryDTOById(id);
@@ -72,6 +76,9 @@ namespace HandmadeMarket.Services
 
         }
 
+        #endregion
+
+        #region GetCategoryByName
         public Result<CategoryWithProductDTO> GetCategoryByName(string CategoryName)
         {
             Category category = categoryRepo.GetCategoryByName(CategoryName);
@@ -100,5 +107,65 @@ namespace HandmadeMarket.Services
                 return Result<CategoryWithProductDTO>.Success(categoryDTO);
             }
         }
+
+        #endregion
+
+        #region AddCategory
+        public Result<string> AddCategory(CategoryDTO categoryDto)
+        {
+            try
+            {
+                Category category = new Category
+                {
+                    name = categoryDto.name,
+                };
+
+                categoryRepo.Add(category);
+                categoryRepo.Save();
+
+                return Result<string>.Success("Category was Created");
+            }
+            catch (Exception ex)
+            {
+                return Result<string>.Failure("Category Not Created");
+            }
+        }
+
+        #endregion
+
+
+        #region UpdateCategory
+        public Result<string> UpdateCategory(int id, CategoryDTO categoryDTO)
+        {
+            Category categoryFromdb = categoryRepo.GetById(id);
+            if (categoryDTO == null)
+            {
+                return Result<string>.Failure("Category not Found");
+            }
+
+            categoryFromdb.name = categoryDTO.name;
+            categoryRepo.Update(id, categoryFromdb);
+            categoryRepo.Save();
+            return Result<string>.Success("Category Update");
+        }
+
+        #endregion
+
+        #region DeleteCategory
+        public Result<string> DeleteCategory(int id)
+        {
+            Category category = categoryRepo.GetById(id);
+            if (category == null)
+            {
+                return Result<string>.Failure($"{nameof(Category)} not found");
+            }
+            categoryRepo.Remove(id);
+            categoryRepo.Save();
+            return Result<string>.Success("Category Deleted");
+        }
+
+        #endregion
+
+
     }
 }

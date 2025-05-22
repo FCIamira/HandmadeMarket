@@ -31,7 +31,7 @@ namespace HandmadeMarket.Repository
             return _dbSet.Find(Id);
         }
 
-       
+
         public void Remove(int id)
         {
 
@@ -48,7 +48,7 @@ namespace HandmadeMarket.Repository
             return false;
         }
 
-        public void Update(int id,T obj)
+        public  void Update(int id, T obj)
         {
             var existingEntity = _dbSet.Find(id);
             if (existingEntity != null)
@@ -62,7 +62,7 @@ namespace HandmadeMarket.Repository
         }
         public void Save()
         {
-           context.SaveChanges();
+            context.SaveChanges();
         }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
+using HandmadeMarket.Services;
 
 namespace HandmadeMarket
 {
@@ -23,7 +24,13 @@ namespace HandmadeMarket
             builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
             builder.Services.AddScoped<IRatingRepo, RatingRepo>();
             builder.Services.AddScoped<IWishList, WishListRepo>();
+            builder.Services.AddScoped<CategoryServices>(); 
+            builder.Services.AddScoped<ProductServices>(); 
+
+
             builder.Services.AddControllers();
+            builder.Services.AddHttpContextAccessor();
+
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

@@ -3,7 +3,7 @@ using HandmadeMarket.Repository;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using HandmadeMarket.Enum;
 
 namespace HandmadeMarket.Services
 {
@@ -30,7 +30,7 @@ namespace HandmadeMarket.Services
             var product = productRepo.GetById(productId);
             if (product == null)
             {
-                return Result<IEnumerable<RatingDTO>>.Failure("Product not found.");
+                return Result<IEnumerable<RatingDTO>>.Failure(ErrorCode.NotFound,"Product not found.");
             }
             // Get ratings for the specified product
             var ratings = ratingRepo.GetRateingsByProductId(productId)
@@ -54,7 +54,7 @@ namespace HandmadeMarket.Services
             var product = productRepo.GetById(productId);
             if (product == null)
             {
-                return Result<string>.Failure("Product not found.");
+                return Result<string>.Failure(ErrorCode.NotFound,"Product not found.");
             }
           
             // Check if this customer already rated this product

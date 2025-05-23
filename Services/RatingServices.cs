@@ -4,6 +4,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using HandmadeMarket.Enum;
+using HandmadeMarket.UnitOfWorks;
 
 namespace HandmadeMarket.Services
 {
@@ -11,12 +12,14 @@ namespace HandmadeMarket.Services
     {
         private readonly IRatingRepo ratingRepo;
         private readonly IProductRepo productRepo;
+        private readonly IUnitOfWork unitOfWork;
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public RatingServices(IRatingRepo ratingRepo,IProductRepo productRepo, IHttpContextAccessor httpContextAccessor)
+        public RatingServices(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
         {
             this.ratingRepo = ratingRepo;
             this.productRepo = productRepo;
+            this.unitOfWork = unitOfWork;
             this.httpContextAccessor = httpContextAccessor;
         }
 

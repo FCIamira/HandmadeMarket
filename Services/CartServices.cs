@@ -12,7 +12,7 @@ public class CartServices
     private  IUnitOfWork unitOfWork { get; }
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CartServices(IUnitOfWork unitOfWork ,ICartRepo cartRepo, IHttpContextAccessor httpContextAccessor)
+    public CartServices(IUnitOfWork unitOfWork , IHttpContextAccessor httpContextAccessor)
     {
         this.unitOfWork = unitOfWork;
         _httpContextAccessor = httpContextAccessor;

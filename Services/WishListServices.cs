@@ -3,6 +3,7 @@ using HandmadeMarket.Repository;
 using Microsoft.AspNetCore.Http;
 using HandmadeMarket.Enum;
 using HandmadeMarket.UnitOfWorks;
+using System.Security.Claims;
 namespace HandmadeMarket.Services
 {
     public class WishListServices
@@ -70,22 +71,22 @@ namespace HandmadeMarket.Services
         #endregion
 
         #region Add
-        public Result<string> Add(WishListDTO dto)
+        public Result<string> Add(int id)///check her if product is exsit or not
         {
-            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value;
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
             {
                 return Result<string>.Failure(ErrorCode.NotFound, "User not authenticated.");
             }
 
-            if (unitOfWork.WishList.Exists(dto.ProductId, userId))
+            if (unitOfWork.WishList.Exists(id, userId))
             {
                 return Result<string>.Failure(ErrorCode.NotFound, "This product is already in your wishlist.");
             }
 
             var wishlist = new Wishlist
             {
-                ProductId = dto.ProductId,
+                ProductId = id,
                 CustomerId = userId
             };
 

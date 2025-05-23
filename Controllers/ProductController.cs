@@ -12,7 +12,7 @@ namespace HandmadeMarket.Controllers
     {
         private readonly ProductServices productServices;
 
-        public ProductController(ProductServices productServices, IProductRepo productRepo)
+        public ProductController(ProductServices productServices)
         {
             this.productServices = productServices;
         }

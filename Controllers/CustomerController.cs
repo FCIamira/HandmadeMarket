@@ -1,5 +1,6 @@
 ﻿using HandmadeMarket.DTO.CustomerDTOs;
 using HandmadeMarket.Repository;
+using HandmadeMarket.UnitOfWorks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,17 +12,17 @@ namespace HandmadeMarket.Controllers
     {
  
 
-            private readonly ICustomerRepo customerRepo;
-            public CustomerController(ICustomerRepo customerRepo)
+            private readonly IUnitOfWork unitOfWork;
+            public CustomerController(IUnitOfWork unitOfWork)
             {
-                this.customerRepo = customerRepo;
+                this.unitOfWork = unitOfWork;
             }
         #region Getall
 
         [HttpGet]
         public ActionResult<IEnumerable<CustomerDTO>> GetAll()
         {
-            var customers = customerRepo.GetAll();
+            var customers = unitOfWork.Customer.GetAll();
             var dtos = customers.Select(c => new CustomerDTO
             {
                 Id = c.UserId,

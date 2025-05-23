@@ -3,6 +3,7 @@ using HandmadeMarket.DTO.CartDTOs;
 using HandmadeMarket.Enum;
 using HandmadeMarket.Helpers;
 using HandmadeMarket.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -10,6 +11,7 @@ namespace HandmadeMarket.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CartController : ControllerBase
     {
         private readonly CartServices _cartService;

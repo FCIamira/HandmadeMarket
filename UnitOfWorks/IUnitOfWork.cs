@@ -3,6 +3,7 @@ namespace HandmadeMarket.UnitOfWorks;
 public interface IUnitOfWork : IDisposable
 {
     IOrderRepo Order { get; }
+    ICustomerRepo Customer { get; }
     IProductRepo Product { get; }
     ICartRepo Cart { get; }
     ICategoryRepo Category { get; }

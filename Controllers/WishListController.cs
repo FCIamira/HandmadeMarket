@@ -41,10 +41,10 @@ public class WishListController : ControllerBase
     #endregion
 
     #region Add
-    [HttpPost]
-    public IActionResult Add([FromBody] WishListDTO dto)
+    [HttpPost("{id:int}")]
+    public IActionResult Add(int id)
     {
-        var result = _wishListServices.Add(dto);
+        var result = _wishListServices.Add(id);
         return result.ToActionResult();
     }
     #endregion

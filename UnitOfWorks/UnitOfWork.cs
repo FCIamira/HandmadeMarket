@@ -8,6 +8,7 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly HandmadeContext applicationDBContext;
     private IOrderRepo _order;
+    private ICustomerRepo _customer;
     private IProductRepo _product;
     private ICartRepo _cartRepo;
     private ICategoryRepo _categoryRepo;
@@ -148,7 +149,21 @@ public class UnitOfWork : IUnitOfWork
             }
             return _cartRepo;
         }
-    } 
+    }
+    #endregion
+
+    #region customerRepo
+    public ICustomerRepo Customer
+    {
+        get
+        {
+            if (_customer is null)
+            {
+                _customer = new CustomerRepo(applicationDBContext);
+            }
+            return _customer;
+        }
+    }
     #endregion
 
     public async Task BeginTransactionAsync()

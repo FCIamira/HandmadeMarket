@@ -7,6 +7,7 @@ namespace HandmadeMarket.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class CategoryController : ControllerBase
     {
         private readonly CategoryServices categoryServices;

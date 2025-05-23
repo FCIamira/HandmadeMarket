@@ -19,13 +19,6 @@ namespace HandmadeMarket
             // Add services to the container.
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
    
-            //builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
-            //builder.Services.AddScoped<ISellerRepo, SellerRepo>();
-            //builder.Services.AddScoped<ICartRepo, CartRepo>();
-            //builder.Services.AddScoped<IShipmentRepo, ShipmentRepo>();
-            //builder.Services.AddScoped<ICustomerRepo, CustomerRepo>();
-            //builder.Services.AddScoped<IRatingRepo, RatingRepo>();
-            //builder.Services.AddScoped<IWishList, WishListRepo>();
             builder.Services.AddScoped<CategoryServices>(); 
             builder.Services.AddScoped<ProductServices>();
             builder.Services.AddScoped<CartServices>();

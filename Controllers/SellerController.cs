@@ -9,12 +9,10 @@ namespace HandmadeMarket.Controllers
     [ApiController]
     public class SellerController : ControllerBase
     {
-        private readonly ISellerRepo sellerRepo;
         private readonly SellerServices sellerService;
 
-        public SellerController(ISellerRepo sellerRepo,SellerServices sellerService)
+        public SellerController(SellerServices sellerService)
         {
-            this.sellerRepo = sellerRepo;
             this.sellerService = sellerService;
         }
 

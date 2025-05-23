@@ -12,36 +12,55 @@ public class WishListController : ControllerBase
         _wishListServices = wishListServices;
     }
 
-    //#region GetAll
-    //[HttpGet]
-    //public IActionResult GetAll()
-    //{
-    //    var result = _wishListServices.GetAll();
-    //    if (result.IsSuccess)
-    //    {
-    //        return Ok(result.Data);
-    //    }
-    //    return BadRequest(result.Error);
-    //}
-    //#endregion
+    #region GetAll
+    [HttpGet]
+    public IActionResult GetAll()
+    {
+        var result = _wishListServices.GetAll();
+        if (result.IsSuccess)
+        {
+            return Ok(result.Data);
+        }
+        return BadRequest(result.Error);
+    }
+    #endregion
 
-    //[HttpGet("{id}")]
-    //public IActionResult GetById(int id)
-    //{
-    //    WishListDTO wishListFromDB = _wishListServices.GetById(id); // إذا كانت موجودة
-    //    if (wishListFromDB == null)
-    //        return NotFound("Wishlist item not found");
+    #region MyRegion
+    [HttpGet("{id}")]
+    public IActionResult GetById(int id)
+    {
+        var result = _wishListServices.GetById(id);
+        if (result.IsSuccess)
+        {
+            return Ok(result.Data);
+        }
+        return BadRequest(result.Error);
+    }
+    #endregion
 
-    //    return Ok(wishListFromDB);
-    //}
+    #region Delete
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+    {
+        var result = _wishListServices.Delete(id); 
+        if (result.IsSuccess)
+            return Ok(result.Data);
 
-    //[HttpDelete("{id}")]
-    //public IActionResult Delete(int id)
-    //{
-    //    var result = _wishListServices.Delete(id); // إذا كانت موجودة في الخدمة
-    //    if (result.IsSuccess)
-    //        return Ok(result.Data);
+        return NotFound(result.Error);
+    }
+    #endregion
 
-    //    return NotFound(result.Error);
-    //}
+    #region Add
+    [HttpPost]
+    public IActionResult Add([FromBody] WishListDTO dto)
+    {
+        var result = _wishListServices.Add(dto);
+        if (result.IsSuccess)
+            return Ok(result.Data);
+
+        return BadRequest(result.Error);
+    } 
+    #endregion
+
+
 }

@@ -7,40 +7,30 @@
         {
             this.handmadeContext = handmadeContext;
         }
-        public List<WishListDTO> GetWishLists()
+        #region GetWishLists
+        public List<Wishlist> GetWishLists()
         {
-            List<WishListDTO> wishLists = handmadeContext.Wishlists.Select(w => new WishListDTO {
-            Id=w.Id,
-            ProductDescription=w.Product.Description,
-            ProductName=w.Product.Name,
-            ProductPrice=w.Product.Price,
-            Image=w.Product.Image,
-            ProductId=w.Product.ProductId
+            return handmadeContext.Wishlists.Include(w => w.Product).ToList();
+        } 
+        #endregion
 
-            
-            }).ToList();
-
-            return wishLists;
+        #region GetWishListById
+        public Wishlist? GetWishListById(int id)
+        {
+            return handmadeContext.Wishlists
+                .Include(w => w.Product)
+                .FirstOrDefault(w => w.Id == id);
         }
-        public WishListDTO GetWishListById(int id)
-        {
-            WishListDTO wishList = handmadeContext.Wishlists
-                .Where(w => w.Id == id)
-                .Include(c=>c.Product)
-                .Select(w => new WishListDTO
-                {
-                    Id = w.Id,
-                    ProductDescription = w.Product.Description,
-                    ProductName = w.Product.Name,
-                    ProductPrice = w.Product.Price,
-                    Image = w.Product.Image,
-                    ProductId = w.Product.ProductId
-                })
-                .FirstOrDefault();
 
-            return wishList;
+        #endregion
+
+        #region Exists
+        public bool Exists(int productId, string customerId)
+        {
+            return handmadeContext.Wishlists.Any(w => w.ProductId == productId && w.CustomerId == customerId);
         }
 
 
+        #endregion
     }
 }

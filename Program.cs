@@ -152,12 +152,12 @@ namespace HandmadeMarket
                 //app.UseSwagger();
                 //app.UseSwaggerUI();
             //}
-            if (app.Environment.IsDevelopment())
-            {
+            //if (app.Environment.IsDevelopment())
+            //{
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
+            //}
 
            
 

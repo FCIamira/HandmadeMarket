@@ -1,27 +1,26 @@
-﻿using HandmadeMarket.DTO.OrderItemDTOs;
-using HandmadeMarket.Enum;
-using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using HandmadeMarket.DTO.OrderItemDTOs;
+using HandmadeMarket.Enum;
+using HandmadeMarket.UnitOfWorks;
+using Microsoft.AspNetCore.Http;
 
 namespace HandmadeMarket.Services
 {
     public class OrderItemServices
     {
-        private readonly IOrderItemRepo orderItemRepo;
-        private readonly IProductRepo productRepo;
+        private IUnitOfWork unitOfWork { get; }
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public OrderItemServices(IHttpContextAccessor httpContextAccessor, IOrderItemRepo orderItemRepo, IProductRepo productRepo)
+        public OrderItemServices( IUnitOfWork unitOfWork ,IHttpContextAccessor httpContextAccessor, IOrderItemRepo orderItemRepo, IProductRepo productRepo)
         {
-            this.orderItemRepo = orderItemRepo;
-            this.productRepo = productRepo;
+            this.unitOfWork = unitOfWork;
             this.httpContextAccessor = httpContextAccessor;
         }
 
         public Result<IEnumerable<ViewOrderItemDto>> GetItemsRelatedToSpecificOrder(int orderId)
         {
-            var orderItems = orderItemRepo.GetOrderItemsByOrderId(orderId);
+            var orderItems = unitOfWork.OrderItem.GetOrderItemsByOrderId(orderId);
             var orderItemDTOs = orderItems.Select(o => new ViewOrderItemDto
             {
                 OrderItemId = o.OrderItemId,
@@ -35,7 +34,7 @@ namespace HandmadeMarket.Services
 
         public Result<ViewOrderItemDto> GetById(int id)
         {
-            var orderItem = orderItemRepo.GetById(id);
+            var orderItem = unitOfWork.OrderItem.GetById(id);
             if (orderItem == null)
             {
                 return Result<ViewOrderItemDto>.Failure(ErrorCode.NotFound, "Order item not found");
@@ -63,7 +62,7 @@ namespace HandmadeMarket.Services
                 return Result<string>.Failure(ErrorCode.BadRequest, "Quantity must be greater than 0");
             }
 
-            var product = productRepo.GetById(orderItem.ProductId);
+            var product = unitOfWork.Product.GetById(orderItem.ProductId);
             if (product == null)
             {
                 return Result<string>.Failure(ErrorCode.NotFound, "Product not found");
@@ -77,8 +76,8 @@ namespace HandmadeMarket.Services
                 ProductId = orderItem.ProductId
             };
 
-            orderItemRepo.Add(newOrderItem);
-            orderItemRepo.Save();
+            unitOfWork.OrderItem.Add(newOrderItem);
+            unitOfWork.SaveChangesAsync();
             return Result<string>.Success("Created");
         }
 
@@ -94,13 +93,13 @@ namespace HandmadeMarket.Services
                 return Result<string>.Failure(ErrorCode.BadRequest, "Quantity must be greater than 0");
             }
 
-            var existingOrderItem = orderItemRepo.GetById(id);
+            var existingOrderItem = unitOfWork.OrderItem.GetById(id);
             if (existingOrderItem == null)
             {
                 return Result<string>.Failure(ErrorCode.NotFound, "Order item not found");
             }
 
-            var product = productRepo.GetById(orderItem.ProductId);
+            var product = unitOfWork.Product.GetById(orderItem.ProductId);
             if (product == null)
             {
                 return Result<string>.Failure(ErrorCode.NotFound, "Product not found");
@@ -110,8 +109,8 @@ namespace HandmadeMarket.Services
             existingOrderItem.Price = product.Price;
             existingOrderItem.ProductId = orderItem.ProductId;
 
-            orderItemRepo.Update(id, existingOrderItem);
-            orderItemRepo.Save();
+            unitOfWork.OrderItem.Update(id, existingOrderItem);
+            unitOfWork.SaveChangesAsync();
 
             return Result<string>.Success("Updated");
         }
@@ -121,14 +120,14 @@ namespace HandmadeMarket.Services
         #region DeleteOrderItem
         public Result<string> DeleteOrderItem(int id)
         {
-            var orderItem = orderItemRepo.GetById(id);
+            var orderItem = unitOfWork.OrderItem.GetById(id);
             if (orderItem == null)
             {
                 return Result<string>.Failure(ErrorCode.NotFound, "Order item not found");
             }
 
-            orderItemRepo.Remove(id);
-            orderItemRepo.Save();
+            unitOfWork.OrderItem.Remove(id);
+            unitOfWork.SaveChangesAsync();
 
             return Result<string>.Success("Deleted");
         }
@@ -146,7 +145,7 @@ namespace HandmadeMarket.Services
                 return Result<List<OrderItemsWithOrderDetails>>.Failure(ErrorCode.Unauthorized, "Seller not authenticated");
             }
 
-            var orders = orderItemRepo.GetAllBySellerId(sellerId, pageSize, pageNumber);
+            var orders = unitOfWork.OrderItem.GetAllBySellerId(sellerId, pageSize, pageNumber);
 
             var dto = orders
                 .Where(oi => oi.Product != null && oi.Order?.Customer != null && oi.Order?.Shipment != null)

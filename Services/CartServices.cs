@@ -9,21 +9,19 @@ using HandmadeMarket.UnitOfWorks;
 
 public class CartServices
 {
-    private readonly ICartRepo _cartRepo;
-    private readonly IUnitOfWork unitOfWork;
+    private  IUnitOfWork unitOfWork { get; }
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public CartServices(IUnitOfWork unitOfWork ,ICartRepo cartRepo, IHttpContextAccessor httpContextAccessor)
     {
         this.unitOfWork = unitOfWork;
-        _cartRepo = cartRepo;
         _httpContextAccessor = httpContextAccessor;
     }
 
     #region GetAll
     public Result<List<CartGetAll>> GetAll()
     {
-        var carts = _cartRepo.GetAll();
+        var carts = unitOfWork.Cart.GetAll();
         if (carts == null || !carts.Any())
             return Result<List<CartGetAll>>.Failure(ErrorCode.NotFound, "No carts found");
 
@@ -47,7 +45,7 @@ public class CartServices
     #region GetById
     public Result<Cart> GetById(int id)
     {
-        var cart = _cartRepo.GetById(id);
+        var cart = unitOfWork.Cart.GetById(id);
         if (cart == null)
             return Result<Cart>.Failure(ErrorCode.NotFound, "Invalid Id");
 
@@ -70,7 +68,7 @@ public class CartServices
             CustomerId = userId
         };
 
-        _cartRepo.Add(cart);
+        unitOfWork.Cart.Add(cart);
         unitOfWork.SaveChangesAsync();
 
         return Result<CartWithProductDTO>.Success(dto);
@@ -84,7 +82,7 @@ public class CartServices
         if (string.IsNullOrEmpty(userId))
             return Result<string>.Failure(ErrorCode.Unauthorized, "User not authenticated");
 
-        var cart = _cartRepo.GetById(id);
+        var cart = unitOfWork.Cart.GetById(id);
         if (cart == null)
             return Result<string>.Failure(ErrorCode.NotFound, "Cart not found");
 
@@ -92,8 +90,8 @@ public class CartServices
         cart.Quantity = cartFromReq.Quantity;
         cart.ModifiedBy = userId;
 
-        _cartRepo.Update(id, cart);
-        _cartRepo.Save();
+        unitOfWork.Cart.Update(id, cart);
+        unitOfWork.SaveChangesAsync();
 
         return Result<string>.Success("Cart is updated successfully");
     }
@@ -106,13 +104,13 @@ public class CartServices
         if (string.IsNullOrEmpty(userId))
             return Result<string>.Failure(ErrorCode.Unauthorized, "User not authenticated");
 
-        var cart = _cartRepo.GetById(id);
+        var cart = unitOfWork.Cart.GetById(id);
         if (cart == null)
             return Result<string>.Failure(ErrorCode.NotFound, "Cart not found");
 
         cart.DeletedBy = userId;
-        _cartRepo.Remove(id);
-        _cartRepo.Save();
+        unitOfWork.Cart.Remove(id);
+        unitOfWork.SaveChangesAsync();
 
         return Result<string>.Success("Cart is deleted successfully");
     }

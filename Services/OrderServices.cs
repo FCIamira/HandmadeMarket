@@ -1,25 +1,28 @@
-﻿using HandmadeMarket.DTO.OrderItemDTOs;
-using HandmadeMarket.Enum;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HandmadeMarket.DTO.OrderItemDTOs;
+using HandmadeMarket.Enum;
+using HandmadeMarket.UnitOfWorks;
 
 namespace HandmadeMarket.Services
 {
     public class OrderServices
     {
-        private readonly IOrderRepo orderRepo;
-        private readonly IProductRepo productRepo;
+        
+        private IUnitOfWork unitOfWork { get; }
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public OrderServices(IProductRepo productRepo, IOrderRepo orderRepo)
+        public OrderServices( IUnitOfWork unitOfWork, IProductRepo productRepo, IOrderRepo orderRepo, IHttpContextAccessor httpContextAccessor)
         {
-            this.productRepo = productRepo;
-            this.orderRepo = orderRepo;
+           
+            this.unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public Result<List<FlatOrder_OrderItems>> GetAll()
         {
-            var orders = orderRepo.GetAll();
+            var orders = unitOfWork.Order.GetAll();
             if (orders == null || !orders.Any())
             {
                 return Result<List<FlatOrder_OrderItems>>.Failure(ErrorCode.NotFound, "No orders found.");
@@ -28,7 +31,7 @@ namespace HandmadeMarket.Services
             var orderDTO = orders.SelectMany(order => order.Order_Items.Select(oi => new FlatOrder_OrderItems
             {
                 Order_Date = order.Order_Date,
-                Total_Price = orderRepo.CalcTotalPrice(oi.Price, oi.Quantity),
+                Total_Price = unitOfWork.Order.CalcTotalPrice(oi.Price, oi.Quantity),
                 CustomerName = order.Customer.FirstName,
                 PricePerItem = oi.Price,
                 Quantity = oi.Quantity,
@@ -40,7 +43,7 @@ namespace HandmadeMarket.Services
 
         public Result<FlatOrder_OrderItems> GetById(int id)
         {
-            var order = orderRepo.GetById(id);
+            var order = unitOfWork.Order.GetById(id);
             if (order == null)
             {
                 return Result<FlatOrder_OrderItems>.Failure(ErrorCode.NotFound, "Order not found.");
@@ -68,7 +71,7 @@ namespace HandmadeMarket.Services
 
             var productIds = orderDto.Items.Select(i => i.ProductId).ToList();
 
-            var products = productRepo.GetAll()
+            var products = unitOfWork.Product.GetAll()
                 .Where(p => productIds.Contains(p.ProductId))
                 .ToDictionary(p => p.ProductId, p => p.Price);
 
@@ -93,8 +96,8 @@ namespace HandmadeMarket.Services
                 Total_Price = orderItems.Sum(oi => oi.Price * oi.Quantity)
             };
 
-            orderRepo.Add(order);
-            orderRepo.Save();
+            unitOfWork.Order.Add(order);
+            unitOfWork.SaveChangesAsync();
 
             return Result<string>.Success("Order created successfully.");
         }
@@ -106,7 +109,7 @@ namespace HandmadeMarket.Services
                 return Result<string>.Failure(ErrorCode.BadRequest, "Order data or items are missing.");
             }
 
-            var existingOrder = orderRepo.GetById(id);
+            var existingOrder = unitOfWork.Order.GetById(id);
             if (existingOrder == null)
             {
                 return Result<string>.Failure(ErrorCode.NotFound, "Order not found.");
@@ -114,7 +117,7 @@ namespace HandmadeMarket.Services
 
             var productIds = orderDto.Items.Select(i => i.ProductId).ToList();
 
-            var products = productRepo.GetAll()
+            var products = unitOfWork.Product.GetAll()
                 .Where(p => productIds.Contains(p.ProductId))
                 .ToDictionary(p => p.ProductId, p => p.Price);
 
@@ -135,22 +138,22 @@ namespace HandmadeMarket.Services
 
             existingOrder.Total_Price = existingOrder.Order_Items.Sum(oi => oi.Price * oi.Quantity);
 
-            orderRepo.Update(id, existingOrder);
-            orderRepo.Save();
+            unitOfWork.Order.Update(id, existingOrder);
+            unitOfWork.SaveChangesAsync();
 
             return Result<string>.Success("Order updated successfully.");
         }
 
         public Result<string> DeleteOrder(int id)
         {
-            var order = orderRepo.GetById(id);
+            var order = unitOfWork.Order.GetById(id);
             if (order == null)
             {
                 return Result<string>.Failure(ErrorCode.NotFound, "Order not found.");
             }
 
-            orderRepo.Remove(id);
-            orderRepo.Save();
+            unitOfWork.Order.Remove(id);
+            unitOfWork.SaveChangesAsync();
 
             return Result<string>.Success("Order deleted successfully.");
         }

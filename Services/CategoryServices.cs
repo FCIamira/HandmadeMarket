@@ -2,19 +2,24 @@
 using HandmadeMarket;
 using HandmadeMarket.DTO.CategoryDTOs;
 using HandmadeMarket.DTO.ProductDTOs;
+using HandmadeMarket.UnitOfWorks;
 
 public class CategoryServices
 {
-    ICategoryRepo categoryRepo;
-    public CategoryServices(ICategoryRepo categoryRepo)
+    public IUnitOfWork UnitOfWork { get; }
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+
+    public CategoryServices(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
     {
-        this.categoryRepo = categoryRepo;
+        UnitOfWork = unitOfWork;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     #region GetAllCategoriesWithProducts
     public Result<List<CategoryWithProductDTO>> GetAllCategoriesWithProducts()
     {
-        IEnumerable<Category> categories = categoryRepo.GetAllCategoriesWithProducts();
+        IEnumerable<Category> categories = UnitOfWork.Category.GetAllCategoriesWithProducts();
         if (categories == null || !categories.Any())
         {
             return Result<List<CategoryWithProductDTO>>.Failure(ErrorCode.NotFound, "No categories found.");
@@ -44,7 +49,7 @@ public class CategoryServices
     #region GetById
     public Result<CategoryWithProductDTO> GetById(int id)
     {
-        Category category = categoryRepo.GetCategoryDTOById(id);
+        Category category = UnitOfWork.Category.GetCategoryDTOById(id);
         if (category == null)
         {
             return Result<CategoryWithProductDTO>.Failure(ErrorCode.NotFound, "Category not found");
@@ -74,7 +79,7 @@ public class CategoryServices
     #region GetCategoryByName
     public Result<CategoryWithProductDTO> GetCategoryByName(string categoryName)
     {
-        Category category = categoryRepo.GetCategoryByName(categoryName);
+        Category category = UnitOfWork.Category.GetCategoryByName(categoryName);
         if (category == null)
         {
             return Result<CategoryWithProductDTO>.Failure(ErrorCode.NotFound, "Category not found");
@@ -111,8 +116,8 @@ public class CategoryServices
                 name = categoryDto.name,
             };
 
-            categoryRepo.Add(category);
-            categoryRepo.Save();
+            UnitOfWork.Category.Add(category);
+            UnitOfWork.SaveChangesAsync();
 
             return Result<string>.Success("Category was created");
         }
@@ -126,15 +131,15 @@ public class CategoryServices
     #region UpdateCategory
     public Result<string> UpdateCategory(int id, CategoryDTO categoryDTO)
     {
-        Category categoryFromDb = categoryRepo.GetById(id);
+        Category categoryFromDb = UnitOfWork.Category.GetById(id);
         if (categoryFromDb == null)
         {
             return Result<string>.Failure(ErrorCode.NotFound, "Category not found");
         }
 
         categoryFromDb.name = categoryDTO.name;
-        categoryRepo.Update(id, categoryFromDb);
-        categoryRepo.Save();
+        UnitOfWork.Category.Update(id, categoryFromDb);
+        UnitOfWork.SaveChangesAsync();
 
         return Result<string>.Success("Category updated");
     }
@@ -143,14 +148,14 @@ public class CategoryServices
     #region DeleteCategory
     public Result<string> DeleteCategory(int id)
     {
-        Category category = categoryRepo.GetById(id);
+        Category category = UnitOfWork.Category.GetById(id);
         if (category == null)
         {
             return Result<string>.Failure(ErrorCode.NotFound, "Category not found");
         }
 
-        categoryRepo.Remove(id);
-        categoryRepo.Save();
+        UnitOfWork.Category.Remove(id);
+        UnitOfWork.SaveChangesAsync();
 
         return Result<string>.Success("Category deleted");
     }

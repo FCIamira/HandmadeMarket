@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using HandmadeMarket.Services;
 using HandmadeMarket.UnitOfWorks;
+using HandmadeMarket.Data;
 
 namespace HandmadeMarket
 {

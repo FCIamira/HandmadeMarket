@@ -7,7 +7,7 @@ global using HandmadeMarket.DTO.OrderDTOs;
 global using HandmadeMarket.Interfaces;
 global using HandmadeMarket.Repository;
 global using System.ComponentModel.DataAnnotations;
-global using HandmadeMarket.Context;
+global using HandmadeMarket.Data;
 global using HandmadeMarket.DTO.AccountDTO;
 global using HandmadeMarket.DTO.CartDTOs;
 global using HandmadeMarket.DTO.CategoryDTOs;

@@ -5,14 +5,17 @@ using HandmadeMarket;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using HandmadeMarket.DTO.CartDTOs;
+using HandmadeMarket.UnitOfWorks;
 
 public class CartServices
 {
     private readonly ICartRepo _cartRepo;
+    private readonly IUnitOfWork unitOfWork;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CartServices(ICartRepo cartRepo, IHttpContextAccessor httpContextAccessor)
+    public CartServices(IUnitOfWork unitOfWork ,ICartRepo cartRepo, IHttpContextAccessor httpContextAccessor)
     {
+        this.unitOfWork = unitOfWork;
         _cartRepo = cartRepo;
         _httpContextAccessor = httpContextAccessor;
     }
@@ -68,7 +71,7 @@ public class CartServices
         };
 
         _cartRepo.Add(cart);
-        _cartRepo.Save();
+        unitOfWork.SaveChangesAsync();
 
         return Result<CartWithProductDTO>.Success(dto);
     }

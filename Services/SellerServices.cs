@@ -5,16 +5,17 @@ using HandmadeMarket.Repository;
 using Microsoft.AspNetCore.Http;
 using HandmadeMarket.Enum;
 using HandmadeMarket.DTO.ProductDTOs;
+using HandmadeMarket.UnitOfWorks;
 namespace HandmadeMarket.Services
 {
     public class SellerServices
     {
-        private readonly ISellerRepo _sellerRepo;
+        private readonly IUnitOfWork unitOfWork;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public SellerServices(ISellerRepo sellerRepo, IHttpContextAccessor httpContextAccessor)
+        public SellerServices(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
         {
-            _sellerRepo = sellerRepo;
+            this.unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -22,7 +23,7 @@ namespace HandmadeMarket.Services
         #region GetAllSellers
         public Result<List<SellerWithProductsDTO>> GetAllSellers()
         {
-            var sellers = _sellerRepo.GetAllSellersWithProducts();
+            var sellers = unitOfWork.Seller.GetAllSellersWithProducts();
 
             if (sellers == null || !sellers.Any())
             {
@@ -52,7 +53,7 @@ namespace HandmadeMarket.Services
         #region GetById
         public Result<SellerWithProductsDTO> GetSellerById(string id)
         {
-            Seller seller = _sellerRepo.GetSellerWithProductsById(id);
+            Seller seller = unitOfWork.Seller.GetSellerWithProductsById(id);
             if (seller == null)
             {
                 return Result<SellerWithProductsDTO>.Failure(ErrorCode.NotFound,"Seller not found");
@@ -84,7 +85,7 @@ namespace HandmadeMarket.Services
         #region GetSellerByStoreName
         public Result<SellerWithProductsDTO> GetSellerByStoreName(string storeName)
         {
-            Seller seller = _sellerRepo.GetSellerWithProductsByStoreName(storeName);
+            Seller seller = unitOfWork.Seller.GetSellerWithProductsByStoreName(storeName);
             if (seller == null)
             {
                 return Result<SellerWithProductsDTO>.Failure(ErrorCode.NotFound, "Seller not found");
@@ -114,7 +115,7 @@ namespace HandmadeMarket.Services
         {
             var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            Seller seller = _sellerRepo.GetSellerByProductId(id);
+            Seller seller = unitOfWork.Seller.GetSellerByProductId(id);
 
             if (seller == null)
             {
@@ -139,7 +140,7 @@ namespace HandmadeMarket.Services
         #region EditSeller
         public Result<SellerWithProductsDTO> EditSeller(string id, SellerDTO sellerDTO)
         {
-            Seller seller = _sellerRepo.GetSellerById(id);
+            Seller seller = unitOfWork.Seller.GetSellerById(id);
             if (seller == null)
             {
                 return Result<SellerWithProductsDTO>.Failure(ErrorCode.NotFound, "Seller not found");
@@ -169,7 +170,7 @@ namespace HandmadeMarket.Services
         #region DeleteSeller
         //public Result<SellerWithProductsDTO> DeleteSellerWithProductsById(string id)
         //{
-        //    bool deleted = _sellerRepo.DeleteSellerWithProductsById(id);
+        //    bool deleted = unitOfWork.Seller.DeleteSellerWithProductsById(id);
         //    if (!deleted)
         //        return Result<bool>.Failure(ErrorCode.NotFound, "Seller not found.");
 

@@ -1,22 +1,23 @@
 ﻿using HandmadeMarket.Enum;
 using HandmadeMarket.Interfaces;
 using HandmadeMarket.Models;
+using HandmadeMarket.UnitOfWorks;
 
 namespace HandmadeMarket.Services
 {
     public class ShipmentServices
     {
-        private readonly IShipmentRepo _shipmentRepo;
+        private readonly IUnitOfWork unitOfWork;
 
-        public ShipmentServices(IShipmentRepo shipmentRepo)
+        public ShipmentServices(IUnitOfWork unitOfWork)
         {
-            _shipmentRepo = shipmentRepo;
+            this.unitOfWork = unitOfWork;
         }
 
         #region GetAll
         public Result<IEnumerable<ShipmentDTO>> GetAll()
         {
-            var shipments = _shipmentRepo.GetAll();
+            var shipments = unitOfWork.Shipment.GetAll();
             if (shipments == null || !shipments.Any())
                 return Result<IEnumerable<ShipmentDTO>>.Failure(ErrorCode.NotFound,"No shipment found");
 
@@ -52,7 +53,7 @@ namespace HandmadeMarket.Services
         #region GetById
         public Result<ShipmentDTO> GetById(int id)
         {
-            var shipment = _shipmentRepo.GetById(id);
+            var shipment = unitOfWork.Shipment.GetById(id);
             if (shipment == null)
                 return Result<ShipmentDTO>.Failure(ErrorCode.NotFound,$"No shipment found with ID {id}");
 
@@ -101,8 +102,8 @@ namespace HandmadeMarket.Services
                 CustomerId = dto.CustomerId
             };
 
-            _shipmentRepo.Add(shipment);
-            _shipmentRepo.Save();
+            unitOfWork.Shipment.Add(shipment);
+            unitOfWork.SaveChangesAsync();  
 
             dto.Id = shipment.Id;
             return Result<ShipmentDTO>.Success(dto);
@@ -113,7 +114,7 @@ namespace HandmadeMarket.Services
         #region Update
         public Result<ShipmentDTO> Update(int id, ShipmentDTO dto)
         {
-            var shipment = _shipmentRepo.GetById(id);
+            var shipment = unitOfWork.Shipment.GetById(id);
             if (shipment == null)
                 return Result<ShipmentDTO>.Failure(ErrorCode.NotFound,$"Shipment with ID {id} not found");
 
@@ -125,8 +126,8 @@ namespace HandmadeMarket.Services
             shipment.Country = dto.Country;
             shipment.CustomerId = dto.CustomerId;
 
-            _shipmentRepo.Update(id, shipment);
-            _shipmentRepo.Save();
+            unitOfWork.Shipment.Update(id, shipment);
+            unitOfWork.SaveChangesAsync();
 
             return Result<ShipmentDTO>.Success(dto);
         }
@@ -136,12 +137,12 @@ namespace HandmadeMarket.Services
         #region Delete
         public Result<string> Delete(int id)
         {
-            var shipment = _shipmentRepo.GetById(id);
+            var shipment = unitOfWork.Shipment.GetById(id);
             if (shipment == null)
                 return Result<string>.Failure(ErrorCode.NotFound,$"Shipment with ID {id} not found.");
 
-            _shipmentRepo.Remove(id);
-            _shipmentRepo.Save();
+            unitOfWork.Shipment.Remove(id);
+            unitOfWork.SaveChangesAsync();
 
             return Result<string>.Success("Shipment deleted successfully.");
         } 

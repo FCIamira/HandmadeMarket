@@ -4,6 +4,7 @@ using HandmadeMarket.Enum;
 using HandmadeMarket.Interfaces;
 using HandmadeMarket.Models;
 using HandmadeMarket.Repository;
+using HandmadeMarket.UnitOfWorks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,18 +13,18 @@ namespace HandmadeMarket.Services
 {
     public class ProductServices
     {
-        private IProductRepo _productRepo;
+        private readonly IUnitOfWork unitOfWork;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ProductServices(IProductRepo productRepo, IHttpContextAccessor httpContextAccessor)
+        public ProductServices(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
         {
-            _productRepo = productRepo;
+            this.unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
         }
         #region GetAllProduct
         public Result<ResponseGetAllProduct> GetAllProduct(int pageNumber = 1, int pageSize = 10)
         {
-            IEnumerable<Product> products = _productRepo.GetAll();
+            IEnumerable<Product> products = unitOfWork.Product.GetAll();
 
             if (products == null || !products.Any())
             {
@@ -67,7 +68,7 @@ namespace HandmadeMarket.Services
         #region GetAllProductsHaveSale
         public Result<List<ProductDTO>> GetAllProductsHaveSale()
         {
-            IEnumerable<Product> products = _productRepo.GetProductsHaveSale();
+            IEnumerable<Product> products = unitOfWork.Product.GetProductsHaveSale();
             var request = _httpContextAccessor.HttpContext?.Request;
 
             List<ProductDTO> productDTO = products.Select(products => new ProductDTO
@@ -96,7 +97,7 @@ namespace HandmadeMarket.Services
 
         public Result<ProductDTO> GetProductById(int id)
         {
-            Product product = _productRepo.GetById(id);
+            Product product = unitOfWork.Product.GetById(id);
             if (product == null)
             {
                 return Result<ProductDTO>.Failure(ErrorCode.NotFound, " Product Not Found");
@@ -126,7 +127,7 @@ namespace HandmadeMarket.Services
         #region GetProductByName
         public Result<ProductDTO> GetProductByName(string name)
         {
-            Product product = _productRepo.GetProductByName(name);
+            Product product = unitOfWork.Product.GetProductByName(name);
             if (product == null)
             {
                 return Result<ProductDTO>.Failure(ErrorCode.NotFound, "Product not found");
@@ -194,7 +195,7 @@ namespace HandmadeMarket.Services
                 sellerId = userId,
                 HasSale = productDTO.HasSale,
                 SalePercentage = productDTO.SalePercentage,
-                PriceAfterSale = _productRepo.CalcPriceAfterSale(productDTO.Price, productDTO.SalePercentage)
+                PriceAfterSale = unitOfWork.Product.CalcPriceAfterSale(productDTO.Price, productDTO.SalePercentage)
             };
 
             if (product == null)
@@ -203,12 +204,12 @@ namespace HandmadeMarket.Services
             }
             else
             {
-                _productRepo.Add(product);
-                _productRepo.Save();
+                unitOfWork.Product.Add(product);
+                unitOfWork.SaveChangesAsync();
                 //update image 1
                 var request = _httpContextAccessor.HttpContext?.Request;
 
-                Product product1 = _productRepo.GetById(product.ProductId);
+                Product product1 = unitOfWork.Product.GetById(product.ProductId);
 
                 var resultDTO = new ProductDTO
                 {
@@ -238,7 +239,7 @@ namespace HandmadeMarket.Services
         {
 
 
-            Product existingProduct = _productRepo.GetProductById(id);
+            Product existingProduct = unitOfWork.Product.GetProductById(id);
             if (existingProduct == null)
             {
                 return Result<ProductDTO>.Failure(ErrorCode.NotFound, "Product Not Found");
@@ -246,10 +247,10 @@ namespace HandmadeMarket.Services
 
             var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            _productRepo.EditProduct(id, productDto, userId);
-            _productRepo.Save();
+            unitOfWork.Product.EditProduct(id, productDto, userId);
+            unitOfWork.SaveChangesAsync();
 
-            Product updatedProduct = _productRepo.GetProductById(id);
+            Product updatedProduct = unitOfWork.Product.GetProductById(id);
             var request = _httpContextAccessor.HttpContext?.Request;
 
             var productDTO = new ProductDTO
@@ -275,13 +276,13 @@ namespace HandmadeMarket.Services
 
         public Result<string> DeleteProduct(int id)
         {
-            Product product = _productRepo.GetById(id);
+            Product product = unitOfWork.Product.GetById(id);
             if (product == null)
             {
                 return Result<string>.Failure(ErrorCode.NotFound, "Product not found");
             }
-            _productRepo.Remove(id);
-            _productRepo.Save();
+            unitOfWork.Product.Remove(id);
+            unitOfWork.SaveChangesAsync();
             return Result<string>.Success("Product Deleded");
         }
         #endregion
@@ -291,7 +292,7 @@ namespace HandmadeMarket.Services
         public async Task<Result<IEnumerable<TopProductsDTO>>> GetTopOrderedProductsWithDetails()
         {
 
-            var topProducts = await _productRepo.GetTopProductsByHighestNumberOfOrder();
+            var topProducts = await unitOfWork.Product.GetTopProductsByHighestNumberOfOrder();
             if (topProducts == null)
             {
                 return Result<IEnumerable<TopProductsDTO>>.Failure(ErrorCode.NotFound, "Product not found");
@@ -304,7 +305,7 @@ namespace HandmadeMarket.Services
         #region FilterProductsByPrice
         public Result<List<ProductDTO>> FilterProductsByPrice(decimal min, decimal max)
         {
-            var products = _productRepo.GetProductsByRanges(min, max);
+            var products = unitOfWork.Product.GetProductsByRanges(min, max);
 
             if (products == null || !products.Any())
             {

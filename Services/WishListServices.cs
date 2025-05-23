@@ -2,23 +2,24 @@
 using HandmadeMarket.Repository;
 using Microsoft.AspNetCore.Http;
 using HandmadeMarket.Enum;
+using HandmadeMarket.UnitOfWorks;
 namespace HandmadeMarket.Services
 {
     public class WishListServices
     {
-        private readonly IWishList _wishListRepo;
+        private readonly IUnitOfWork unitOfWork;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public WishListServices(IWishList wishListRepo, IHttpContextAccessor httpContextAccessor)
+        public WishListServices(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
         {
-            _wishListRepo = wishListRepo;
+            this.unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
         }
 
         #region GetAll
         public Result<IEnumerable<WishListDTO>> GetAll()
         {
-            var wishlists = _wishListRepo.GetWishLists();
+            var wishlists = unitOfWork.WishList.GetWishLists();
 
             if (wishlists == null || !wishlists.Any())
             {
@@ -45,7 +46,7 @@ namespace HandmadeMarket.Services
         #region GetById
         public Result<WishListDTO> GetById(int id)
         {
-            var wishlist = _wishListRepo.GetWishListById(id);
+            var wishlist = unitOfWork.WishList.GetWishListById(id);
             if (wishlist == null)
                 return Result<WishListDTO>.Failure(ErrorCode.NotFound, "Wishlist item not found");
 
@@ -77,7 +78,7 @@ namespace HandmadeMarket.Services
                 return Result<string>.Failure(ErrorCode.NotFound, "User not authenticated.");
             }
 
-            if (_wishListRepo.Exists(dto.ProductId, userId))
+            if (unitOfWork.WishList.Exists(dto.ProductId, userId))
             {
                 return Result<string>.Failure(ErrorCode.NotFound, "This product is already in your wishlist.");
             }
@@ -88,8 +89,8 @@ namespace HandmadeMarket.Services
                 CustomerId = userId
             };
 
-            _wishListRepo.Add(wishlist);
-            _wishListRepo.Save();
+            unitOfWork.WishList.Add(wishlist);
+            unitOfWork.SaveChangesAsync();
 
             return Result<string>.Success("Item added to wishlist successfully");
         }
@@ -99,12 +100,12 @@ namespace HandmadeMarket.Services
         #region Delete
         public Result<string> Delete(int id)
         {
-            var wishlist = _wishListRepo.GetById(id);
+            var wishlist = unitOfWork.WishList.GetById(id);
             if (wishlist == null)
                 return Result<string>.Failure(ErrorCode.NotFound, "Wishlist item not found");
 
-            _wishListRepo.Remove(id);
-            _wishListRepo.Save();
+            unitOfWork.WishList.Remove(id);
+            unitOfWork.SaveChangesAsync();
 
             return Result<string>.Success("Wishlist item deleted successfully");
         }

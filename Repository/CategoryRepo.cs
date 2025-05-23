@@ -1,4 +1,5 @@
 ﻿
+using HandmadeMarket.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace HandmadeMarket.Repository

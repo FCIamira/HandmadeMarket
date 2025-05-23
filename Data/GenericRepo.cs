@@ -1,10 +1,9 @@
-﻿using HandmadeMarket.Interfaces;
-using HandmadeMarket.Migrations;
+﻿using HandmadeMarket.Migrations;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Collections.Generic;
 
-namespace HandmadeMarket.Repository
+namespace HandmadeMarket.Data
 {
     public class GenericRepo<T> : IGenericRepo<T> where T : class
     {

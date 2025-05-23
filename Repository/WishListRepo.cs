@@ -1,4 +1,6 @@
-﻿namespace HandmadeMarket.Repository
+﻿using HandmadeMarket.Data;
+
+namespace HandmadeMarket.Repository
 {
     public class WishListRepo:GenericRepo<Wishlist>,IWishList
     {

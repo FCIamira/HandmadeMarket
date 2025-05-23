@@ -1,4 +1,5 @@
-﻿using HandmadeMarket.DTO.ProductDTOs;
+﻿using HandmadeMarket.Data;
+using HandmadeMarket.DTO.ProductDTOs;
 
 namespace HandmadeMarket.Interfaces
 {

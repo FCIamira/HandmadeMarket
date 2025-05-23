@@ -1,4 +1,5 @@
 ﻿
+using HandmadeMarket.Data;
 using HandmadeMarket.DTO.SellersDTOs;
 
 namespace HandmadeMarket.Repository

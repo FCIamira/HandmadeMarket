@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using HandmadeMarket.Data;
 using HandmadeMarket.DTO.AccountDTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

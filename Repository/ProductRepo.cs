@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 using System.Security.Claims;
 using HandmadeMarket.DTO.ProductDTOs;
+using HandmadeMarket.Data;
 
 namespace HandmadeMarket.Repository
 {

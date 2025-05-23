@@ -1,5 +1,4 @@
-﻿
-using HandmadeMarket.Context;
+﻿using HandmadeMarket.Data;
 
 namespace HandmadeMarket.Repository
 {

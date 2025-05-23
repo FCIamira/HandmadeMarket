@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace HandmadeMarket.Interfaces
+namespace HandmadeMarket.Data
 {
     public interface IGenericRepo<T>
     {

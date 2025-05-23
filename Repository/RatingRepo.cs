@@ -1,4 +1,6 @@
 ﻿
+using HandmadeMarket.Data;
+
 namespace HandmadeMarket.Repository
 {
     public class RatingRepo : GenericRepo<Rating>, IRatingRepo

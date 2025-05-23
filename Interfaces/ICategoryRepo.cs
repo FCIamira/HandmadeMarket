@@ -1,4 +1,6 @@
-﻿namespace HandmadeMarket.Interfaces
+﻿using HandmadeMarket.Data;
+
+namespace HandmadeMarket.Interfaces
 {
     public interface ICategoryRepo: IGenericRepo<Category>
     {

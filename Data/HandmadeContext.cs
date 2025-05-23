@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using HandmadeMarket.Models;
-using Microsoft.AspNetCore.Identity; // تأكد من وجود هذا الاستخدام لنماذجك
+using Microsoft.AspNetCore.Identity;
 
-namespace HandmadeMarket.Context
+namespace HandmadeMarket.Data
 {
     public class HandmadeContext : IdentityDbContext<ApplicationUser>
     {

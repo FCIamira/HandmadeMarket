@@ -1,4 +1,5 @@
-﻿using HandmadeMarket.Models;
+﻿using HandmadeMarket.Data;
+using HandmadeMarket.Models;
 
 namespace HandmadeMarket.Interfaces
 {

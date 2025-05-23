@@ -1,12 +1,8 @@
-﻿using HandmadeMarket.DTO;
-using HandmadeMarket.DTO;
+﻿using HandmadeMarket.Helpers;
 using HandmadeMarket.Models;
 using HandmadeMarket.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace HandmadeMarket.Controllers
 {
@@ -14,152 +10,100 @@ namespace HandmadeMarket.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly ProductServices productRepo1;
-        private readonly IProductRepo productRepo;
+        private readonly ProductServices productServices;
 
-        public ProductController(ProductServices productRepo1, IProductRepo productRepo)
+        public ProductController(ProductServices productServices, IProductRepo productRepo)
         {
-            this.productRepo1 = productRepo1;
-            this.productRepo = productRepo;
+            this.productServices = productServices;
         }
-        #region GetAll
 
+        #region GetAll
         [HttpGet]
         public IActionResult GetAllProduct(int pageNumber = 1, int pageSize = 10)
         {
-
-            var result= productRepo1.GetAllProduct(pageNumber, pageSize);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = productServices.GetAllProduct(pageNumber, pageSize);
+            return result.ToActionResult();
         }
         #endregion
-
 
         #region GetAll Products that have sale
         [HttpGet("sale")]
         public IActionResult GetAllProductsHaveSale()
         {
-            var result = productRepo1.GetAllProductsHaveSale();
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
-
+            var result = productServices.GetAllProductsHaveSale();
+            return result.ToActionResult();
         }
-
         #endregion
 
         #region GetProductById
         [HttpGet("{id}")]
         public IActionResult GetProductById(int id)
         {
-            var result = productRepo1.GetProductById(id);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
-
+            var result = productServices.GetProductById(id);
+            return result.ToActionResult();
         }
-
-
         #endregion
 
         #region GetProductByName
         [HttpGet("name/{name:alpha}")]
         public IActionResult GetProductByName(string name)
         {
-            var result = productRepo1.GetProductByName(name);
-
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = productServices.GetProductByName(name);
+            return result.ToActionResult();
         }
         #endregion
-
 
         #region CreateProduct 
         [Authorize(Roles = "Seller")]
-
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromForm] AddProductDTO productDTO)
         {
-            var result = await productRepo1.CreateProduct(productDTO);
-            if (ModelState.IsValid)
-            {
-                if (result.IsSuccess)
-                {
-                    return Ok(result);
-                }
-                return BadRequest(result);
-            }
-            return BadRequest(ModelState);
-        
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var result = await productServices.CreateProduct(productDTO);
+            return result.ToActionResult();
         }
-
         #endregion
 
-
         #region Edit product
-
         [HttpPut("{id}")]
         public IActionResult EditProduct(int id, [FromForm] AddProductDTO productDto)
         {
-            var result =  productRepo1.EditProduct(id, productDto);
-            if (ModelState.IsValid)
-            {
-                if (result.IsSuccess)
-                {
-                    return Ok(result);
-                }
-                return BadRequest(result);
-            }
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var result = productServices.EditProduct(id, productDto);
+            return result.ToActionResult();
         }
-
         #endregion
 
-        #region delete product
-
+        #region Delete product
         [HttpDelete("{id:int}")]
         public IActionResult DeleteProduct(int id)
         {
-            var result = productRepo1.DeleteProduct(id);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = productServices.DeleteProduct(id);
+            return result.ToActionResult();
         }
         #endregion
 
-        #region get top products
+        #region Get top products
         [HttpGet("top-ordered-with-details")]
-        public async Task<ActionResult> GetTopOrderedProductsWithDetails()
+        public async Task<IActionResult> GetTopOrderedProductsWithDetails()
         {
-            var result = await productRepo1.GetTopOrderedProductsWithDetails();
-            if (result.IsSuccess)
-                return Ok(result.Data); 
-            return BadRequest(result.Error);
+            var result = await productServices.GetTopOrderedProductsWithDetails();
+            return result.ToActionResult();
+        }
+        #endregion
+
+        #region Filter products by price range
+        [HttpGet("p")]
+        public IActionResult FilterProductsByPrice(decimal min, decimal max)
+        {
+            var result = productServices.FilterProductsByPrice(min, max);
+            return result.ToActionResult();
         }
 
         #endregion
-
-
-        [HttpGet("p")]
-        public IActionResult FilterProductsByPrice(decimal min, decimal max) {
-            List<ProductDTO> products = productRepo.GetProductsByRanges(min, max);
-            return Ok(products);
-
-        }
-
     }
 }

@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using HandmadeMarket.DTO.OrderItemDTOs;
+using HandmadeMarket.Enum;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HandmadeMarket.Services
 {
@@ -8,7 +11,8 @@ namespace HandmadeMarket.Services
         private readonly IOrderItemRepo orderItemRepo;
         private readonly IProductRepo productRepo;
         private readonly IHttpContextAccessor httpContextAccessor;
-        public OrderItemServices(IHttpContextAccessor httpContextAccessor,IOrderItemRepo orderItemRepo, IProductRepo productRepo)
+
+        public OrderItemServices(IHttpContextAccessor httpContextAccessor, IOrderItemRepo orderItemRepo, IProductRepo productRepo)
         {
             this.orderItemRepo = orderItemRepo;
             this.productRepo = productRepo;
@@ -17,8 +21,8 @@ namespace HandmadeMarket.Services
 
         public Result<IEnumerable<ViewOrderItemDto>> GetItemsRelatedToSpecificOrder(int orderId)
         {
-            IEnumerable<OrderItem> orderItems = orderItemRepo.GetOrderItemsByOrderId(orderId);
-            IEnumerable<ViewOrderItemDto> orderItemDTOs = orderItems.Select(o => new ViewOrderItemDto
+            var orderItems = orderItemRepo.GetOrderItemsByOrderId(orderId);
+            var orderItemDTOs = orderItems.Select(o => new ViewOrderItemDto
             {
                 OrderItemId = o.OrderItemId,
                 OrderId = o.OrderId,
@@ -31,13 +35,13 @@ namespace HandmadeMarket.Services
 
         public Result<ViewOrderItemDto> GetById(int id)
         {
-            OrderItem orderItem = orderItemRepo.GetById(id);
-
+            var orderItem = orderItemRepo.GetById(id);
             if (orderItem == null)
             {
-                return Result<ViewOrderItemDto>.Failure("Not Found");
+                return Result<ViewOrderItemDto>.Failure(ErrorCode.NotFound, "Order item not found");
             }
-            ViewOrderItemDto orderItemDTO = new ViewOrderItemDto
+
+            var dto = new ViewOrderItemDto
             {
                 OrderItemId = orderItem.OrderItemId,
                 OrderId = orderItem.OrderId,
@@ -45,106 +49,120 @@ namespace HandmadeMarket.Services
                 PricePerItem = orderItem.Price,
                 ProductName = orderItem.Product.Name
             };
-            return Result<ViewOrderItemDto>.Success(orderItemDTO);
-
+            return Result<ViewOrderItemDto>.Success(dto);
         }
 
         public Result<string> CreateOrderItem(AddOrderItemDTO orderItem)
         {
             if (orderItem == null)
             {
-                return Result<string>.Failure("Order item is null");
+                return Result<string>.Failure(ErrorCode.BadRequest, "Order item is null");
             }
             if (orderItem.Quantity <= 0)
             {
-                return Result<string>.Failure("Quantity must be greater than 0");
+                return Result<string>.Failure(ErrorCode.BadRequest, "Quantity must be greater than 0");
             }
-            Product product = productRepo.GetById(orderItem.ProductId);
+
+            var product = productRepo.GetById(orderItem.ProductId);
             if (product == null)
             {
-                return Result<string>.Failure("Product not found");
+                return Result<string>.Failure(ErrorCode.NotFound, "Product not found");
             }
 
-                OrderItem newOrderItem = new OrderItem
-                {
-                    OrderId = orderItem.OrderId,
-                    Quantity = orderItem.Quantity,
-                    Price = product.Price,
-                    ProductId = orderItem.ProductId
-                };
-                orderItemRepo.Add(newOrderItem);
-                orderItemRepo.Save();
-                return Result<string>.Success("Created");
-            
+            var newOrderItem = new OrderItem
+            {
+                OrderId = orderItem.OrderId,
+                Quantity = orderItem.Quantity,
+                Price = product.Price,
+                ProductId = orderItem.ProductId
+            };
 
+            orderItemRepo.Add(newOrderItem);
+            orderItemRepo.Save();
+            return Result<string>.Success("Created");
         }
 
-        public Result<string> UpdateOrderItem(int id,AddOrderItemDTO orderItem)
+        #region UpdateOrderItem
+        public Result<string> UpdateOrderItem(int id, AddOrderItemDTO orderItem)
         {
             if (orderItem == null)
             {
-                return Result<string>.Failure("Order item is null");
+                return Result<string>.Failure(ErrorCode.BadRequest, "Order item is null");
             }
             if (orderItem.Quantity <= 0)
             {
-                return Result<string>.Failure("Quantity must be greater than 0");
+                return Result<string>.Failure(ErrorCode.BadRequest, "Quantity must be greater than 0");
             }
-            OrderItem existingOrderItem = orderItemRepo.GetById(id);
-            Product product = productRepo.GetById(orderItem.ProductId);
+
+            var existingOrderItem = orderItemRepo.GetById(id);
             if (existingOrderItem == null)
             {
-                return Result<string>.Failure("Order item not found");
+                return Result<string>.Failure(ErrorCode.NotFound, "Order item not found");
             }
-            else
+
+            var product = productRepo.GetById(orderItem.ProductId);
+            if (product == null)
             {
-                existingOrderItem.Quantity = orderItem.Quantity;
-                existingOrderItem.Price = product.Price;
-                orderItemRepo.Update(id, existingOrderItem);
-                orderItemRepo.Save();
-                return Result<string>.Success("Updated");
+                return Result<string>.Failure(ErrorCode.NotFound, "Product not found");
             }
+
+            existingOrderItem.Quantity = orderItem.Quantity;
+            existingOrderItem.Price = product.Price;
+            existingOrderItem.ProductId = orderItem.ProductId;
+
+            orderItemRepo.Update(id, existingOrderItem);
+            orderItemRepo.Save();
+
+            return Result<string>.Success("Updated");
         }
+
+        #endregion
+
+        #region DeleteOrderItem
         public Result<string> DeleteOrderItem(int id)
         {
-            OrderItem orderItem = orderItemRepo.GetById(id);
+            var orderItem = orderItemRepo.GetById(id);
             if (orderItem == null)
             {
-                return Result<string>.Failure("Order item not found");
+                return Result<string>.Failure(ErrorCode.NotFound, "Order item not found");
             }
+
             orderItemRepo.Remove(id);
             orderItemRepo.Save();
+
             return Result<string>.Success("Deleted");
         }
 
+        #endregion
+
+
+        #region GetAllBySellerId
         public Result<List<OrderItemsWithOrderDetails>> GetAllBySellerId(int pageNumber = 1, int pageSize = 5)
         {
             var sellerId = httpContextAccessor.HttpContext?.User?.FindFirst("Id")?.Value;
-            if (sellerId != null)
+
+            if (string.IsNullOrEmpty(sellerId))
             {
-                IEnumerable<OrderItem> orders = orderItemRepo.GetAllBySellerId(sellerId, pageSize, pageNumber);
-                List<OrderItemsWithOrderDetails> DTO = new List<OrderItemsWithOrderDetails>();
-
-                foreach (OrderItem orderItem in orders)
-                {
-                    if (orderItem.Product != null && orderItem.Order?.Customer != null && orderItem.Order?.Shipment != null)
-                    {
-                        DTO.Add(new OrderItemsWithOrderDetails
-                        {
-                            ProductName = orderItem.Product.Name,
-                            Price = orderItem.Price,
-                            Quantity = orderItem.Quantity,
-                            CustomerAddress = orderItem.Order.Customer.Address,
-                            CustomerName = orderItem.Order.Customer.FirstName,
-                            ShipmentDate = orderItem.Order.Shipment.ShipmentDate
-                        });
-                    }
-
-
-                }
-                return Result<List<OrderItemsWithOrderDetails>>.Success(DTO);
-
+                return Result<List<OrderItemsWithOrderDetails>>.Failure(ErrorCode.Unauthorized, "Seller not authenticated");
             }
-                return Result<List<OrderItemsWithOrderDetails>>.Failure("sell doesn't exist");
+
+            var orders = orderItemRepo.GetAllBySellerId(sellerId, pageSize, pageNumber);
+
+            var dto = orders
+                .Where(oi => oi.Product != null && oi.Order?.Customer != null && oi.Order?.Shipment != null)
+                .Select(orderItem => new OrderItemsWithOrderDetails
+                {
+                    ProductName = orderItem.Product.Name,
+                    Price = orderItem.Price,
+                    Quantity = orderItem.Quantity,
+                    CustomerAddress = orderItem.Order.Customer.Address,
+                    CustomerName = orderItem.Order.Customer.FirstName,
+                    ShipmentDate = orderItem.Order.Shipment.ShipmentDate
+                }).ToList();
+
+            return Result<List<OrderItemsWithOrderDetails>>.Success(dto);
         }
+
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿using HandmadeMarket.Services;
+﻿using HandmadeMarket.Helpers;
+using HandmadeMarket.Services;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -12,36 +13,39 @@ public class WishListController : ControllerBase
         _wishListServices = wishListServices;
     }
 
-    //#region GetAll
-    //[HttpGet]
-    //public IActionResult GetAll()
-    //{
-    //    var result = _wishListServices.GetAll();
-    //    if (result.IsSuccess)
-    //    {
-    //        return Ok(result.Data);
-    //    }
-    //    return BadRequest(result.Error);
-    //}
-    //#endregion
+    #region GetAll
+    [HttpGet]
+    public IActionResult GetAll()
+    {
+        var result = _wishListServices.GetAll();
+        return result.ToActionResult();
+    }
+    #endregion
 
-    //[HttpGet("{id}")]
-    //public IActionResult GetById(int id)
-    //{
-    //    WishListDTO wishListFromDB = _wishListServices.GetById(id); // إذا كانت موجودة
-    //    if (wishListFromDB == null)
-    //        return NotFound("Wishlist item not found");
+    #region GetById
+    [HttpGet("{id}")]
+    public IActionResult GetById(int id)
+    {
+        var result = _wishListServices.GetById(id);
+        return result.ToActionResult();
+    }
+    #endregion
 
-    //    return Ok(wishListFromDB);
-    //}
+    #region Delete
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+    {
+        var result = _wishListServices.Delete(id);
+        return result.ToActionResult();
+    }
+    #endregion
 
-    //[HttpDelete("{id}")]
-    //public IActionResult Delete(int id)
-    //{
-    //    var result = _wishListServices.Delete(id); // إذا كانت موجودة في الخدمة
-    //    if (result.IsSuccess)
-    //        return Ok(result.Data);
-
-    //    return NotFound(result.Error);
-    //}
+    #region Add
+    [HttpPost]
+    public IActionResult Add([FromBody] WishListDTO dto)
+    {
+        var result = _wishListServices.Add(dto);
+        return result.ToActionResult();
+    }
+    #endregion
 }

@@ -1,8 +1,5 @@
 ﻿
-using HandmadeMarket.DTO;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using HandmadeMarket.DTO.SellersDTOs;
 
 namespace HandmadeMarket.Repository
 {
@@ -13,22 +10,36 @@ namespace HandmadeMarket.Repository
         {
             this.context = context;
         }
+        
+        //public SellerWithProductsDTO DeleteSellerWithProductsById(string id)
+        //{
+        //    var sellerData = context.Sellers
+        //        .Where(s => s.UserId == id)
+        //        .Select(s => new SellerWithProductsDTO
+        //        {
+        //            sellerId = s.UserId,
+        //            storeName = s.storeName,
+        //            email = s.email,
+        //            phoneNumber = s.phoneNumber,
+        //            createdAt = s.createdAt,
+        //            Products = s.Products.Select(p => new ProductDTO
+        //            {
+        //                Name = p.Name,
+        //                Description = p.Description,
+        //                Price = p.Price
+        //            }).ToList()
+        //        })
+        //        .FirstOrDefault();
+        //    context.Products
+        //        .Where(p => p.sellerId == id)
+        //        .ExecuteDelete();
 
-        public bool DeleteSellerWithProductsById(string id)
-        {
-            var seller = context.Sellers
-                .Include(s => s.Products)
-                .FirstOrDefault(s => s.UserId == id);
+        //    context.Sellers
+        //        .Where(s => s.UserId == id)
+        //        .ExecuteDelete();
 
-            if (seller == null)
-                return false;
-
-            context.Sellers.Remove(seller);
-            context.SaveChanges();
-            return true;
-        }
-
-
+        //    return sellerData;
+        //}
         public IEnumerable<Seller> GetAllSellersWithProducts()
         {
             var sellers = context.Sellers
@@ -49,7 +60,7 @@ namespace HandmadeMarket.Repository
 
         public Seller GetSellerByProductId(int id)
         {
-            Seller? seller = context.Sellers
+            Seller? seller= context.Sellers
                 .Where(s => s.Products.Any(p => p.ProductId == id))
                 .FirstOrDefault();
             return seller;
@@ -71,5 +82,7 @@ namespace HandmadeMarket.Repository
                 .FirstOrDefault();
             return sellers;
         }
+
+
     }
 }

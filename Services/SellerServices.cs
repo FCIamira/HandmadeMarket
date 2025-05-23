@@ -3,7 +3,8 @@ using Azure.Core;
 using HandmadeMarket.Interfaces;
 using HandmadeMarket.Repository;
 using Microsoft.AspNetCore.Http;
-
+using HandmadeMarket.Enum;
+using HandmadeMarket.DTO.ProductDTOs;
 namespace HandmadeMarket.Services
 {
     public class SellerServices
@@ -25,7 +26,7 @@ namespace HandmadeMarket.Services
 
             if (sellers == null || !sellers.Any())
             {
-                return Result<List<SellerWithProductsDTO>>.Failure("No sellers found");
+                return Result<List<SellerWithProductsDTO>>.Failure(ErrorCode.NotFound,"No sellers found");
             }
 
             var sellerDtos = sellers.Select(s => new SellerWithProductsDTO
@@ -54,7 +55,7 @@ namespace HandmadeMarket.Services
             Seller seller = _sellerRepo.GetSellerWithProductsById(id);
             if (seller == null)
             {
-                return Result<SellerWithProductsDTO>.Failure("Seller not found");
+                return Result<SellerWithProductsDTO>.Failure(ErrorCode.NotFound,"Seller not found");
             }
             else
             {
@@ -86,7 +87,7 @@ namespace HandmadeMarket.Services
             Seller seller = _sellerRepo.GetSellerWithProductsByStoreName(storeName);
             if (seller == null)
             {
-                return Result<SellerWithProductsDTO>.Failure("Seller not found");
+                return Result<SellerWithProductsDTO>.Failure(ErrorCode.NotFound, "Seller not found");
             }
             else
             {
@@ -117,7 +118,7 @@ namespace HandmadeMarket.Services
 
             if (seller == null)
             {
-                return Result<SellerDTO>.Failure("Seller not found");
+                return Result<SellerDTO>.Failure(ErrorCode.NotFound, "Seller not found");
             }
             else
             {
@@ -141,7 +142,7 @@ namespace HandmadeMarket.Services
             Seller seller = _sellerRepo.GetSellerById(id);
             if (seller == null)
             {
-                return Result<SellerWithProductsDTO>.Failure("Seller not found");
+                return Result<SellerWithProductsDTO>.Failure(ErrorCode.NotFound, "Seller not found");
             }
             var Request = _httpContextAccessor.HttpContext?.Request;
             SellerWithProductsDTO sellerWithProductsDTO = new SellerWithProductsDTO
@@ -166,14 +167,14 @@ namespace HandmadeMarket.Services
 
         #endregion
         #region DeleteSeller
-        public Result<string> DeleteSellerWithProductsById(string id)
-        {
-            bool deleted = _sellerRepo.DeleteSellerWithProductsById(id);
-            if (!deleted)
-                return Result<string>.Failure("Seller not found.");
+        //public Result<SellerWithProductsDTO> DeleteSellerWithProductsById(string id)
+        //{
+        //    bool deleted = _sellerRepo.DeleteSellerWithProductsById(id);
+        //    if (!deleted)
+        //        return Result<bool>.Failure(ErrorCode.NotFound, "Seller not found.");
 
-            return Result<string>.Success("Seller and associated products deleted successfully.");
-        }
+        //    return Result<bool>.Success(deleted);
+        //}
 
         #endregion
 

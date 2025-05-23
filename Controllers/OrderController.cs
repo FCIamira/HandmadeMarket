@@ -1,7 +1,5 @@
-﻿using HandmadeMarket.DTO;
+﻿using HandmadeMarket.Helpers; // ← مهم لإضافة ToActionResult()
 using HandmadeMarket.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HandmadeMarket.Controllers
@@ -21,12 +19,8 @@ namespace HandmadeMarket.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            Result<List<FlatOrder_OrderItems>> result = orderServices.GetAll();
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = orderServices.GetAll();
+            return result.ToActionResult();
         }
         #endregion
 
@@ -34,59 +28,42 @@ namespace HandmadeMarket.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            Result<FlatOrder_OrderItems> result = orderServices.GetById(id);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = orderServices.GetById(id);
+            return result.ToActionResult();
         }
         #endregion
 
         #region Create Order
         [HttpPost]
-        public IActionResult CreateOrder(AddOrderDTO orderDto)
+        public IActionResult CreateOrder([FromBody] AddOrderDTO orderDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            Result<string> result = orderServices.CreateOrder(orderDto);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = orderServices.CreateOrder(orderDto);
+            return result.ToActionResult();
         }
         #endregion
 
         #region Update Order
-
         [HttpPut("{id}")]
-        public IActionResult UpdateOrder(int id, AddOrderDTO orderDto)
+        public IActionResult UpdateOrder(int id, [FromBody] AddOrderDTO orderDto)
         {
-            Result<string> result = orderServices.UpdateOrder(id,orderDto);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = orderServices.UpdateOrder(id, orderDto);
+            return result.ToActionResult();
         }
-
-
         #endregion
 
         #region Delete Order
         [HttpDelete("{id}")]
         public IActionResult DeleteOrder(int id)
         {
-            Result<string> result = orderServices.DeleteOrder(id);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = orderServices.DeleteOrder(id);
+            return result.ToActionResult();
         }
         #endregion
-
-
-
     }
 }

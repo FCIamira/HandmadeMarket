@@ -126,16 +126,16 @@ namespace HandmadeMarket.Controllers
         #endregion
 
         #region DeleteSeller
-        [HttpDelete("{id}")]
-        public IActionResult DeleteSellerWithProductsById(string id)
-        {
-            var result = sellerService.DeleteSellerWithProductsById(id);
+        //[HttpDelete("{id}")]
+        //public IActionResult DeleteSellerWithProductsById(string id)
+        //{
+        //    var result = sellerService.DeleteSellerWithProductsById(id);
 
-            if (!result.IsSuccess)
-                return NotFound();
+        //    if (!result.IsSuccess)
+        //        return NotFound();
 
-            return Ok();
-        } 
+        //    return Ok();
+        //} 
         #endregion
 
 

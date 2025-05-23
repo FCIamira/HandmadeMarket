@@ -1,4 +1,6 @@
-﻿namespace HandmadeMarket.Interfaces
+﻿using HandmadeMarket.DTO.CartDTOs;
+
+namespace HandmadeMarket.Interfaces
 {
     public interface ICartRepo:IGenericRepo<Cart>
     {

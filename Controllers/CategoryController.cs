@@ -1,9 +1,7 @@
-﻿using HandmadeMarket.DTO;
-using HandmadeMarket.Services;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using HandmadeMarket.Services;
+using HandmadeMarket.Helpers; 
 using Microsoft.AspNetCore.Mvc;
+using HandmadeMarket.DTO.CategoryDTOs;
 
 namespace HandmadeMarket.Controllers
 {
@@ -11,114 +9,75 @@ namespace HandmadeMarket.Controllers
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        ICategoryRepo categoryRepo;
-        CategoryServices categoryServices;
+        private readonly CategoryServices categoryServices;
+
         public CategoryController(ICategoryRepo categoryRepo, CategoryServices categoryServices)
         {
-            this.categoryRepo = categoryRepo;
             this.categoryServices = categoryServices;
         }
+
         #region GetAll
         [HttpGet]
         public IActionResult GetAll()
         {
-            Result<List<CategoryWithProductDTO>> result = categoryServices.GetAllCategoriesWithProducts();
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = categoryServices.GetAllCategoriesWithProducts();
+            return result.ToActionResult();
         }
-
         #endregion
 
         #region GetByID
         [HttpGet("{id:int}")]
         public IActionResult GetById(int id)
         {
-            Result<CategoryWithProductDTO> result = categoryServices.GetById(id);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = categoryServices.GetById(id);
+            return result.ToActionResult();
         }
         #endregion
-
 
         #region GetCategoryByName
-        [HttpGet("{CategoryName:alpha}")]
+        [HttpGet("by-name/{CategoryName:alpha}")]
         public IActionResult GetCategoryByName(string CategoryName)
         {
-            Result<CategoryWithProductDTO> result = categoryServices.GetCategoryByName(CategoryName);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = categoryServices.GetCategoryByName(CategoryName);
+            return result.ToActionResult();
         }
-
         #endregion
-
 
         #region AddCategory
         [HttpPost]
-        public IActionResult AddCategory(CategoryDTO categoryDto)
+        public IActionResult AddCategory([FromBody] CategoryDTO categoryDto)
         {
-            if (ModelState.IsValid)
-            {
-                var result = categoryServices.AddCategory(categoryDto);
-                if (result.IsSuccess)
-                {
-                    return Ok(result);
-                }
-                return BadRequest(result);
-            }
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-
+            var result = categoryServices.AddCategory(categoryDto);
+            return result.ToActionResult();
         }
-
         #endregion
 
         #region UpdateCategory
-        [HttpPut]
-        public IActionResult UpdateCategory(int id, CategoryDTO categoryDTO)
+        [HttpPut("{id:int}")]
+        public IActionResult UpdateCategory(int id, [FromBody] CategoryDTO categoryDTO)
         {
-            if (ModelState.IsValid)
-            {
-                var result = categoryServices.UpdateCategory(id, categoryDTO);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-                if (result.IsSuccess)
-                {
-
-                    return Ok(result);
-                }
-                return BadRequest(result);
-            }
-            return BadRequest(ModelState);
+            var result = categoryServices.UpdateCategory(id, categoryDTO);
+            return result.ToActionResult();
         }
         #endregion
 
         #region DeleteCategory
-        [HttpDelete]
+        [HttpDelete("{id:int}")]
         public IActionResult DeleteCategory(int id)
         {
-            if (ModelState.IsValid)
-            {
-                var result = categoryServices.DeleteCategory(id);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-                if (result.IsSuccess)
-                {
-
-                    return Ok(result);
-                }
-            }
-            return BadRequest(ModelState);
+            var result = categoryServices.DeleteCategory(id);
+            return result.ToActionResult();
         }
-
         #endregion
-
 
     }
 }

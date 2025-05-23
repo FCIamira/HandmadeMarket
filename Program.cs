@@ -31,6 +31,10 @@ namespace HandmadeMarket
             builder.Services.AddScoped<SellerServices>();
             builder.Services.AddScoped<OrderServices>();
             builder.Services.AddScoped<OrderItemServices>();
+            builder.Services.AddScoped<WishListServices>();
+            builder.Services.AddScoped<ShipmentServices>();
+
+
 
 
 
@@ -144,14 +148,17 @@ namespace HandmadeMarket
             // Configure the HTTP request pipeline.
             //if (app.Environment.IsDevelopment())
             //{
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                //app.UseSwagger();
+                //app.UseSwaggerUI();
             //}
             if (app.Environment.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+           
 
             app.UseCors("MyPolicy");
             app.UseAuthentication();

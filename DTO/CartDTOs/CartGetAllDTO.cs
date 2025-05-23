@@ -1,6 +1,6 @@
 ﻿namespace HandmadeMarket.DTO.CartDTOs
 {
-    public class CartGetAll
+    public class CartGetAllDTO
     {
         public int Id { get; set; }
         public int Quantity { get; set; }

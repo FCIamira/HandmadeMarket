@@ -19,15 +19,15 @@ public class CartServices
     }
 
     #region GetAll
-    public Result<List<CartGetAll>> GetAll()
+    public Result<List<CartGetAllDTO>> GetAll()
     {
         var carts = unitOfWork.Cart.GetAll();
         if (carts == null || !carts.Any())
-            return Result<List<CartGetAll>>.Failure(ErrorCode.NotFound, "No carts found");
+            return Result<List<CartGetAllDTO>>.Failure(ErrorCode.NotFound, "No carts found");
 
         var request = _httpContextAccessor.HttpContext?.Request;
 
-        var cartsDto = carts.Select(c => new CartGetAll
+        var cartsDto = carts.Select(c => new CartGetAllDTO
         {
             Id = c.Id,
             ProductId = c.ProductId,
@@ -38,7 +38,7 @@ public class CartServices
             Image = string.IsNullOrEmpty(c.Product.Image) ? null : $"{request.Scheme}://{request.Host}{c.Product.Image}",
         }).ToList();
 
-        return Result<List<CartGetAll>>.Success(cartsDto);
+        return Result<List<CartGetAllDTO>>.Success(cartsDto);
     }
     #endregion
 

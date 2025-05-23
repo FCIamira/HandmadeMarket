@@ -12,7 +12,7 @@ namespace HandmadeMarket.Services
         private IUnitOfWork unitOfWork { get; }
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public OrderItemServices( IUnitOfWork unitOfWork ,IHttpContextAccessor httpContextAccessor, IOrderItemRepo orderItemRepo, IProductRepo productRepo)
+        public OrderItemServices( IUnitOfWork unitOfWork ,IHttpContextAccessor httpContextAccessor)
         {
             this.unitOfWork = unitOfWork;
             this.httpContextAccessor = httpContextAccessor;

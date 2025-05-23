@@ -1,4 +1,4 @@
-﻿using HandmadeMarket.DTO;
+﻿using HandmadeMarket.Enum;
 using HandmadeMarket.Interfaces;
 using HandmadeMarket.Models;
 
@@ -18,7 +18,7 @@ namespace HandmadeMarket.Services
         {
             var shipments = _shipmentRepo.GetAll();
             if (shipments == null || !shipments.Any())
-                return Result<IEnumerable<ShipmentDTO>>.Failure("No shipment found");
+                return Result<IEnumerable<ShipmentDTO>>.Failure(ErrorCode.NotFound,"No shipment found");
 
             var shipmentDTOs = shipments.Select(s => new ShipmentDTO
             {
@@ -54,7 +54,7 @@ namespace HandmadeMarket.Services
         {
             var shipment = _shipmentRepo.GetById(id);
             if (shipment == null)
-                return Result<ShipmentDTO>.Failure($"No shipment found with ID {id}");
+                return Result<ShipmentDTO>.Failure(ErrorCode.NotFound,$"No shipment found with ID {id}");
 
             var shipmentDTO = new ShipmentDTO
             {
@@ -115,7 +115,7 @@ namespace HandmadeMarket.Services
         {
             var shipment = _shipmentRepo.GetById(id);
             if (shipment == null)
-                return Result<ShipmentDTO>.Failure($"Shipment with ID {id} not found");
+                return Result<ShipmentDTO>.Failure(ErrorCode.NotFound,$"Shipment with ID {id} not found");
 
             shipment.ShipmentDate = dto.ShipmentDate;
             shipment.Address = dto.Address;
@@ -138,7 +138,7 @@ namespace HandmadeMarket.Services
         {
             var shipment = _shipmentRepo.GetById(id);
             if (shipment == null)
-                return Result<string>.Failure($"Shipment with ID {id} not found.");
+                return Result<string>.Failure(ErrorCode.NotFound,$"Shipment with ID {id} not found.");
 
             _shipmentRepo.Remove(id);
             _shipmentRepo.Save();

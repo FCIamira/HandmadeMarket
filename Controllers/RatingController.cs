@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using HandmadeMarket.DTO.RatingDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

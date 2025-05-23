@@ -1,11 +1,7 @@
-﻿using HandmadeMarket.DTO;
-using HandmadeMarket.Interfaces;
-using HandmadeMarket.Models;
-using HandmadeMarket.Repository;
+﻿using HandmadeMarket.Helpers;
 using HandmadeMarket.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
 namespace HandmadeMarket.Controllers
 {
     [Route("api/[controller]")]
@@ -19,36 +15,23 @@ namespace HandmadeMarket.Controllers
             _shipmentServices = shipmentServices;
         }
 
-    
-    #region GetAll
-    [HttpGet]
+        #region GetAll
+        [HttpGet]
         public IActionResult GetAllShipment()
         {
             var result = _shipmentServices.GetAll();
-            if (result.IsSuccess)
-                return Ok(result.Data);
-
-            return NotFound(result.Error);
+            return result.ToActionResult();
         }
-
         #endregion
 
-
         #region GetByID
-
         [HttpGet("{id:int}")]
         public IActionResult GetShipmentByID(int id)
         {
             var result = _shipmentServices.GetById(id);
-            if (result.IsSuccess)
-                return Ok(result.Data);
-
-            return NotFound(result.Error);
+            return result.ToActionResult();
         }
-
-
         #endregion
-
 
         #region AddShipment
         [HttpPost]
@@ -58,13 +41,14 @@ namespace HandmadeMarket.Controllers
                 return BadRequest(ModelState);
 
             var result = _shipmentServices.Add(shipmentDto);
-            return CreatedAtAction(nameof(GetShipmentByID), new { id = result.Data.Id }, result.Data);
-        }
+            if (result.IsSuccess)
+                return CreatedAtAction(nameof(GetShipmentByID), new { id = result.Data.Id }, result.Data);
 
+            return result.ToActionResult(); 
+        }
         #endregion
 
-
-        #region UdateShipment    
+        #region UpdateShipment    
         [HttpPut("{id:int}")]
         public IActionResult UpdateShipment(int id, [FromBody] ShipmentDTO shipmentDto)
         {
@@ -72,30 +56,17 @@ namespace HandmadeMarket.Controllers
                 return BadRequest(ModelState);
 
             var result = _shipmentServices.Update(id, shipmentDto);
-            if (result.IsSuccess)
-                return Ok(result.Data);
-
-            return NotFound(result.Error);
+            return result.ToActionResult();
         }
-
-
         #endregion
-
 
         #region DeleteShipment
         [HttpDelete("{id:int}")]
         public IActionResult DeleteShipment(int id)
         {
             var result = _shipmentServices.Delete(id);
-            if (result.IsSuccess)
-                return Ok(result.Data);
-
-            return NotFound(result.Error);
+            return result.ToActionResult();
         }
-
         #endregion
-
-
-
     }
 }

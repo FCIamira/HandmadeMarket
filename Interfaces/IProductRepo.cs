@@ -1,4 +1,6 @@
-﻿namespace HandmadeMarket.Interfaces
+﻿using HandmadeMarket.DTO.ProductDTOs;
+
+namespace HandmadeMarket.Interfaces
 {
     public interface IProductRepo: IGenericRepo<Product>
     {

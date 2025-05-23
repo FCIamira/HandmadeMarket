@@ -1,8 +1,7 @@
-﻿using HandmadeMarket.DTO;
-using HandmadeMarket.Models;
+﻿using HandmadeMarket.Models;
 using HandmadeMarket.Repository;
 using Microsoft.AspNetCore.Http;
-
+using HandmadeMarket.Enum;
 namespace HandmadeMarket.Services
 {
     public class WishListServices
@@ -23,7 +22,7 @@ namespace HandmadeMarket.Services
 
             if (wishlists == null || !wishlists.Any())
             {
-                return Result<IEnumerable<WishListDTO>>.Failure("Wishlist is empty");
+                return Result<IEnumerable<WishListDTO>>.Failure(ErrorCode.NotFound,"Wishlist is empty");
             }
 
             var request = _httpContextAccessor.HttpContext?.Request;
@@ -48,7 +47,7 @@ namespace HandmadeMarket.Services
         {
             var wishlist = _wishListRepo.GetWishListById(id);
             if (wishlist == null)
-                return Result<WishListDTO>.Failure("Wishlist item not found");
+                return Result<WishListDTO>.Failure(ErrorCode.NotFound, "Wishlist item not found");
 
             var request = _httpContextAccessor.HttpContext?.Request;
 
@@ -75,12 +74,12 @@ namespace HandmadeMarket.Services
             var userId = _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value;
             if (string.IsNullOrEmpty(userId))
             {
-                return Result<string>.Failure("User not authenticated.");
+                return Result<string>.Failure(ErrorCode.NotFound, "User not authenticated.");
             }
 
             if (_wishListRepo.Exists(dto.ProductId, userId))
             {
-                return Result<string>.Failure("This product is already in your wishlist.");
+                return Result<string>.Failure(ErrorCode.NotFound, "This product is already in your wishlist.");
             }
 
             var wishlist = new Wishlist
@@ -102,7 +101,7 @@ namespace HandmadeMarket.Services
         {
             var wishlist = _wishListRepo.GetById(id);
             if (wishlist == null)
-                return Result<string>.Failure("Wishlist item not found");
+                return Result<string>.Failure(ErrorCode.NotFound, "Wishlist item not found");
 
             _wishListRepo.Remove(id);
             _wishListRepo.Save();

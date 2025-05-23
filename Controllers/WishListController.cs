@@ -1,4 +1,5 @@
-﻿using HandmadeMarket.Services;
+﻿using HandmadeMarket.Helpers;
+using HandmadeMarket.Services;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -17,24 +18,16 @@ public class WishListController : ControllerBase
     public IActionResult GetAll()
     {
         var result = _wishListServices.GetAll();
-        if (result.IsSuccess)
-        {
-            return Ok(result.Data);
-        }
-        return BadRequest(result.Error);
+        return result.ToActionResult();
     }
     #endregion
 
-    #region MyRegion
+    #region GetById
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
     {
         var result = _wishListServices.GetById(id);
-        if (result.IsSuccess)
-        {
-            return Ok(result.Data);
-        }
-        return BadRequest(result.Error);
+        return result.ToActionResult();
     }
     #endregion
 
@@ -42,11 +35,8 @@ public class WishListController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var result = _wishListServices.Delete(id); 
-        if (result.IsSuccess)
-            return Ok(result.Data);
-
-        return NotFound(result.Error);
+        var result = _wishListServices.Delete(id);
+        return result.ToActionResult();
     }
     #endregion
 
@@ -55,12 +45,7 @@ public class WishListController : ControllerBase
     public IActionResult Add([FromBody] WishListDTO dto)
     {
         var result = _wishListServices.Add(dto);
-        if (result.IsSuccess)
-            return Ok(result.Data);
-
-        return BadRequest(result.Error);
-    } 
+        return result.ToActionResult();
+    }
     #endregion
-
-
 }

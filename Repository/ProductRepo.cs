@@ -1,11 +1,9 @@
-﻿
-using HandmadeMarket.DTO;
-using HandmadeMarket.Models;
+﻿using HandmadeMarket.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
-using HandmadeMarket.DTO;
 using System.Security.Claims;
+using HandmadeMarket.DTO.ProductDTOs;
 
 namespace HandmadeMarket.Repository
 {

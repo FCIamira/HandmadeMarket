@@ -1,4 +1,5 @@
-﻿using HandmadeMarket.Models;
+﻿using HandmadeMarket.Helpers;
+using HandmadeMarket.Models;
 using HandmadeMarket.Repository;
 using HandmadeMarket.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -20,12 +21,8 @@ namespace HandmadeMarket.Controllers
         [HttpGet]
         public IActionResult GetItemsRelatedToSpecificOrder(int orderId)
         {
-            Result<IEnumerable<ViewOrderItemDto>> result = orderItemServices.GetItemsRelatedToSpecificOrder(orderId);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = orderItemServices.GetItemsRelatedToSpecificOrder(orderId);
+            return result.ToActionResult();
         }
         #endregion
 
@@ -33,39 +30,29 @@ namespace HandmadeMarket.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            Result<ViewOrderItemDto> result = orderItemServices.GetById(id);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = orderItemServices.GetById(id);
+            return result.ToActionResult();
         }
-        
+
         #endregion
 
         #region Create OrderItem
         [HttpPost]
-        public IActionResult CreateOrderItem([FromBody] AddOrderItemDTO orderItem)
-        {
-            Result<string> result = orderItemServices.CreateOrderItem(orderItem);
-            if (result.IsSuccess)
+       
+            public IActionResult CreateOrderItem([FromBody] AddOrderItemDTO orderItem)
             {
-                return Ok(result);
+                var result = orderItemServices.CreateOrderItem(orderItem);
+                return result.ToActionResult();
             }
-            return BadRequest(result);
-        }
+        
         #endregion
 
         #region Update OrderItem
         [HttpPut("{id}")]
         public IActionResult UpdateOrderItem(int id, [FromBody] AddOrderItemDTO orderItem)
         {
-            Result<string> result = orderItemServices.UpdateOrderItem(id,orderItem);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = orderItemServices.UpdateOrderItem(id, orderItem);
+            return result.ToActionResult();
         }
         #endregion
 
@@ -73,12 +60,8 @@ namespace HandmadeMarket.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteOrderItem(int id)
         {
-            Result<string> result = orderItemServices.DeleteOrderItem(id);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
+            var result = orderItemServices.DeleteOrderItem(id);
+            return result.ToActionResult();
         }
         #endregion
 
@@ -87,16 +70,11 @@ namespace HandmadeMarket.Controllers
         #region Get All
 
         [HttpGet("seller-orders")]
-       // [Authorize(Roles = "Seller")]
+        // [Authorize(Roles = "Seller")]
         public IActionResult GetAllBySellerId(int pageNumber = 1, int pageSize = 5)
         {
-            Result<List<OrderItemsWithOrderDetails>> result = orderItemServices.GetAllBySellerId(pageNumber,pageSize);
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
-
+            var result = orderItemServices.GetAllBySellerId(pageNumber, pageSize);
+            return result.ToActionResult();
         }
         #endregion
 

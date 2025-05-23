@@ -1,4 +1,6 @@
-﻿namespace HandmadeMarket.Repository
+﻿using HandmadeMarket.DTO.CartDTOs;
+
+namespace HandmadeMarket.Repository
 {
     public class CartRepo:GenericRepo<Cart>,ICartRepo
     {

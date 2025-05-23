@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
-using HandmadeMarket.DTO.Product;
+using HandmadeMarket.DTO.ProductDTOs;
+using HandmadeMarket.Enum;
 using HandmadeMarket.Interfaces;
 using HandmadeMarket.Models;
 using HandmadeMarket.Repository;
@@ -26,7 +27,7 @@ namespace HandmadeMarket.Services
 
             if (products == null || !products.Any())
             {
-                return Result<ResponseGetAllProduct>.Failure("product Not Found ");
+                return Result<ResponseGetAllProduct>.Failure(ErrorCode.NotFound, "product Not Found ");
             }
 
             int totalCount = products.Count();
@@ -83,7 +84,7 @@ namespace HandmadeMarket.Services
 
             if (products == null)
             {
-                return Result<List<ProductDTO>>.Failure("Product Not Found");
+                return Result<List<ProductDTO>>.Failure(ErrorCode.NotFound, "Product Not Found");
             }
             return Result<List<ProductDTO>>.Success(productDTO);
         }
@@ -98,7 +99,7 @@ namespace HandmadeMarket.Services
             Product product = _productRepo.GetById(id);
             if (product == null)
             {
-                return Result<ProductDTO>.Failure(" Product Not Found");
+                return Result<ProductDTO>.Failure(ErrorCode.NotFound, " Product Not Found");
             }
             else
             {
@@ -128,7 +129,7 @@ namespace HandmadeMarket.Services
             Product product = _productRepo.GetProductByName(name);
             if (product == null)
             {
-                return Result<ProductDTO>.Failure("Product not found");
+                return Result<ProductDTO>.Failure(ErrorCode.NotFound, "Product not found");
             }
             else
             {
@@ -178,7 +179,7 @@ namespace HandmadeMarket.Services
             var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
             {
-                return Result<Product>.Failure("Unauthorized: User ID not found.");
+                return Result<Product>.Failure(ErrorCode.Unauthorized, "Unauthorized: User ID not found.");
             }
 
 
@@ -198,7 +199,7 @@ namespace HandmadeMarket.Services
 
             if (product == null)
             {
-                return Result<Product>.Failure("product Not Found ");
+                return Result<Product>.Failure(ErrorCode.NotFound, "product Not Found ");
             }
             else
             {
@@ -240,7 +241,7 @@ namespace HandmadeMarket.Services
             Product existingProduct = _productRepo.GetProductById(id);
             if (existingProduct == null)
             {
-                return Result<ProductDTO>.Failure("Product Not Found");
+                return Result<ProductDTO>.Failure(ErrorCode.NotFound, "Product Not Found");
             }
 
             var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -277,7 +278,7 @@ namespace HandmadeMarket.Services
             Product product = _productRepo.GetById(id);
             if (product == null)
             {
-                return Result<string>.Failure("Product not found");
+                return Result<string>.Failure(ErrorCode.NotFound, "Product not found");
             }
             _productRepo.Remove(id);
             _productRepo.Save();
@@ -293,13 +294,41 @@ namespace HandmadeMarket.Services
             var topProducts = await _productRepo.GetTopProductsByHighestNumberOfOrder();
             if (topProducts == null)
             {
-                return Result<IEnumerable<TopProductsDTO>>.Failure("Product not found");
+                return Result<IEnumerable<TopProductsDTO>>.Failure(ErrorCode.NotFound, "Product not found");
             }
             return Result<IEnumerable<TopProductsDTO>>.Success(topProducts);
         }
         #endregion
 
 
+        #region FilterProductsByPrice
+        public Result<List<ProductDTO>> FilterProductsByPrice(decimal min, decimal max)
+        {
+            var products = _productRepo.GetProductsByRanges(min, max);
+
+            if (products == null || !products.Any())
+            {
+                return Result<List<ProductDTO>>.Failure(ErrorCode.NotFound, "No products found in the specified price range.");
+            }
+
+            var request = _httpContextAccessor.HttpContext?.Request;
+
+            var productDTOs = products.Select(p => new ProductDTO
+            {
+                ProductId = p.ProductId,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                Stock = p.Stock,
+                Image = string.IsNullOrEmpty(p.Image) ? null : $"{request?.Scheme}://{request?.Host}{p.Image}",
+                PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
+                SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0
+            }).ToList();
+
+            return Result<List<ProductDTO>>.Success(productDTOs);
+        }
+
+        #endregion
     }
 }
 

@@ -1,5 +1,4 @@
-﻿using HandmadeMarket.DTO;
-using HandmadeMarket.Models;
+﻿using HandmadeMarket.Models;
 using HandmadeMarket.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

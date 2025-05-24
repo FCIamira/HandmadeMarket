@@ -68,14 +68,15 @@ namespace HandmadeMarket.Controllers
 
         #region Edit product
         [HttpPut("{id}")]
-        public IActionResult EditProduct(int id, [FromForm] AddProductDTO productDto)
+        public async Task<IActionResult> EditProduct(int id, [FromForm] AddProductDTO productDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = productServices.EditProduct(id, productDto);
-            return result.ToActionResult();
+            var result = await productServices.EditProduct(id, productDto); 
+            return result.ToActionResult(); 
         }
+
         #endregion
 
         #region Delete product

@@ -53,22 +53,13 @@ namespace HandmadeMarket.Repository
 
             return context.Products.Include(p => p.Ratings);
 
-        }         
+        }
 
         public Product GetProductById(int id)
         {
-            Product product = context.Products.FirstOrDefault(Product => Product.ProductId == id);
-                //.Select( p => new ProductDTO
-                //{
-                //    ProductId = p.ProductId,
-                //    Description = p.Description,
-                //    Name = p.Name,
-                //    Price = p.Price,
-                //    Stock = p.Stock,
-                //    Image = p.Image
-                //}).FirstOrDefault();
-            return product;
+            return context.Products.FirstOrDefault(p => p.ProductId == id);
         }
+
 
         public Product GetProductByName(string name)
         {

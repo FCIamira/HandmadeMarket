@@ -12,7 +12,7 @@ namespace HandmadeMarket.Controllers
     {
         private readonly CategoryServices categoryServices;
 
-        public CategoryController(ICategoryRepo categoryRepo, CategoryServices categoryServices)
+        public CategoryController( CategoryServices categoryServices)
         {
             this.categoryServices = categoryServices;
         }

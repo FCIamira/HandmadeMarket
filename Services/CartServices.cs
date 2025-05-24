@@ -21,7 +21,9 @@ public class CartServices
     #region GetAll
     public Result<List<CartGetAllDTO>> GetAll()
     {
-        var carts = unitOfWork.Cart.GetAll();
+         var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var carts = unitOfWork.Cart.GetByUserId(userId);
         if (carts == null || !carts.Any())
             return Result<List<CartGetAllDTO>>.Failure(ErrorCode.NotFound, "No carts found");
 
@@ -76,7 +78,7 @@ public class CartServices
     #endregion
 
     #region Update
-    public Result<string> Update(int id, UpdateCartDTO cartFromReq)
+    public async Task<Result<string>> Update(int id, UpdateCartDTO cartFromReq)
     {
         var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
@@ -86,15 +88,36 @@ public class CartServices
         if (cart == null)
             return Result<string>.Failure(ErrorCode.NotFound, "Cart not found");
 
-        cart.Id = cartFromReq.Id;
+        // cart.Id = cartFromReq.Id;
+
         cart.Quantity = cartFromReq.Quantity;
         cart.ModifiedBy = userId;
 
         unitOfWork.Cart.Update(id, cart);
-        unitOfWork.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
 
         return Result<string>.Success("Cart is updated successfully");
     }
+
+    //public Result<string> Update(int id, UpdateCartDTO cartFromReq)
+    //{
+    //    var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+    //    if (string.IsNullOrEmpty(userId))
+    //        return Result<string>.Failure(ErrorCode.Unauthorized, "User not authenticated");
+
+    //    var cart = unitOfWork.Cart.GetById(id);
+    //    if (cart == null)
+    //        return Result<string>.Failure(ErrorCode.NotFound, "Cart not found");
+
+    //    //cart.Id = cartFromReq.Id;
+    //    cart.Quantity = cartFromReq.Quantity;
+    //    cart.ModifiedBy = userId;
+
+    //    unitOfWork.Cart.Update(id, cart);
+    //    unitOfWork.SaveChangesAsync();
+
+    //    return Result<string>.Success("Cart is updated successfully");
+    //}
     #endregion
 
     #region Delete

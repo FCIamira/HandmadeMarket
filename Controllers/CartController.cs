@@ -53,14 +53,15 @@ namespace HandmadeMarket.Controllers
 
         #region Update
         [HttpPut("{id:int}")]
-        public IActionResult Update(int id, [FromBody] UpdateCartDTO cartFromReq)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateCartDTO cartFromReq)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = _cartService.Update(id, cartFromReq);
-            return result.ToActionResult();
+            var result = await _cartService.Update(id, cartFromReq); 
+            return result.ToActionResult(); 
         }
+
         #endregion
 
         #region Delete

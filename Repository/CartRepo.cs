@@ -31,6 +31,22 @@ namespace HandmadeMarket.Repository
             return handmadeContext.Carts.Include(c => c.Product).ToList();
         }
 
+        public IEnumerable<Cart> GetByUserId(string userId)
+        {
+            return handmadeContext.Carts
+                .Include(c => c.Product)
+                .Where(c => c.CustomerId == userId)
+                .ToList();
+        }
+
+
+        public override Cart GetById(int id)
+        {
+            return handmadeContext.Carts
+                .Include(c => c.Product)
+                .FirstOrDefault(c => c.Id == id);
+        }
+
 
     }
 }

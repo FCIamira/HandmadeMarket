@@ -7,6 +7,7 @@ using System.Security.Claims;
 using HandmadeMarket.Services;
 using HandmadeMarket.UnitOfWorks;
 using HandmadeMarket.Data;
+using Microsoft.Extensions.FileProviders;
 
 namespace HandmadeMarket
 {
@@ -122,6 +123,12 @@ namespace HandmadeMarket
 
             var app = builder.Build();
             app.UseStaticFiles();
+        //    app.UseStaticFiles(new StaticFileOptions
+        //    {
+        //        FileProvider = new PhysicalFileProvider(
+        //Path.Combine(Directory.GetCurrentDirectory(), "uploads")),
+        //        RequestPath = "/uploads"
+        //    });
 
             // Seed Default Roles
             using (var scope = app.Services.CreateScope())

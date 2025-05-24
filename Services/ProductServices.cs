@@ -46,7 +46,8 @@ namespace HandmadeMarket.Services
                 Description = p.Description,
                 Price = p.Price,
                 Stock = p.Stock,
-                Image = string.IsNullOrEmpty(p.Image) ? null : $"{request?.Scheme}://{request?.Host}{p.Image}",
+                //Image = string.IsNullOrEmpty(p.Image) ? null : $"{request?.Scheme}://{request?.Host}{p.Image}",
+                Image = p.Image,
 
                 PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
                 SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
@@ -204,8 +205,8 @@ namespace HandmadeMarket.Services
             }
             else
             {
-                unitOfWork.Product.Add(product);
-                unitOfWork.SaveChangesAsync();
+                await unitOfWork.Product.Add(product);
+                await unitOfWork.SaveChangesAsync();
                 //update image 1
                 var request = _httpContextAccessor.HttpContext?.Request;
 
@@ -235,10 +236,9 @@ namespace HandmadeMarket.Services
 
         #region Edit product
 
-        public Result<ProductDTO> EditProduct(int id, [FromForm] AddProductDTO productDto)
+
+        public async Task<Result<ProductDTO>> EditProduct(int id, [FromForm] AddProductDTO productDto)
         {
-
-
             Product existingProduct = unitOfWork.Product.GetProductById(id);
             if (existingProduct == null)
             {
@@ -247,10 +247,10 @@ namespace HandmadeMarket.Services
 
             var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            unitOfWork.Product.EditProduct(id, productDto, userId);
-            unitOfWork.SaveChangesAsync();
+             unitOfWork.Product.EditProduct(id, productDto, userId);
+            await unitOfWork.SaveChangesAsync(); 
 
-            Product updatedProduct = unitOfWork.Product.GetProductById(id);
+            Product updatedProduct = unitOfWork.Product.GetProductById(id); 
             var request = _httpContextAccessor.HttpContext?.Request;
 
             var productDTO = new ProductDTO
@@ -264,11 +264,46 @@ namespace HandmadeMarket.Services
                 Image = string.IsNullOrEmpty(updatedProduct.Image) ? null : $"{request.Scheme}://{request.Host}{updatedProduct.Image}",
                 SalePercentage = updatedProduct.SalePercentage ?? 0,
                 PriceAfterSale = updatedProduct.PriceAfterSale > 0 ? updatedProduct.PriceAfterSale : updatedProduct.Price
-
             };
 
             return Result<ProductDTO>.Success(productDTO);
         }
+
+
+        //public Result<ProductDTO> EditProduct(int id, [FromForm] AddProductDTO productDto)
+        //{
+
+
+        //    Product existingProduct = unitOfWork.Product.GetProductById(id);
+        //    if (existingProduct == null)
+        //    {
+        //        return Result<ProductDTO>.Failure(ErrorCode.NotFound, "Product Not Found");
+        //    }
+
+        //    var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //    unitOfWork.Product.EditProduct(id, productDto, userId);
+        //    unitOfWork.SaveChangesAsync();
+
+        //    Product updatedProduct = unitOfWork.Product.GetProductById(id);
+        //    var request = _httpContextAccessor.HttpContext?.Request;
+
+        //    var productDTO = new ProductDTO
+        //    {
+        //        ProductId = updatedProduct.ProductId,
+        //        CategoryId = updatedProduct.categoryId,
+        //        Name = updatedProduct.Name,
+        //        Description = updatedProduct.Description,
+        //        Price = updatedProduct.Price,
+        //        Stock = updatedProduct.Stock,
+        //        Image = string.IsNullOrEmpty(updatedProduct.Image) ? null : $"{request.Scheme}://{request.Host}{updatedProduct.Image}",
+        //        SalePercentage = updatedProduct.SalePercentage ?? 0,
+        //        PriceAfterSale = updatedProduct.PriceAfterSale > 0 ? updatedProduct.PriceAfterSale : updatedProduct.Price
+
+        //    };
+
+        //    return Result<ProductDTO>.Success(productDTO);
+        //}
 
         #endregion
 

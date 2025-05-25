@@ -3,6 +3,8 @@ using HandmadeMarket;
 using HandmadeMarket.DTO.CategoryDTOs;
 using HandmadeMarket.DTO.ProductDTOs;
 using HandmadeMarket.UnitOfWorks;
+using Azure.Core;
+using HandmadeMarket.Models;
 
 public class CategoryServices
 {
@@ -24,6 +26,7 @@ public class CategoryServices
         {
             return Result<List<CategoryWithProductDTO>>.Failure(ErrorCode.NotFound, "No categories found.");
         }
+        var request = _httpContextAccessor.HttpContext?.Request;
 
         var categoryDTOs = categories.Select(c => new CategoryWithProductDTO
         {
@@ -36,7 +39,7 @@ public class CategoryServices
                 Description = p.Description,
                 ProductId = p.ProductId,
                 Stock = p.Stock,
-                Image = p.Image,
+                Image = string.IsNullOrEmpty(p.Image) ? null : $"{request.Scheme}://{request.Host}{p.Image}",
                 PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
                 SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
             }).ToList() ?? new List<ProductDTO>()
@@ -54,6 +57,7 @@ public class CategoryServices
         {
             return Result<CategoryWithProductDTO>.Failure(ErrorCode.NotFound, "Category not found");
         }
+        var request = _httpContextAccessor.HttpContext?.Request;
 
         var categoryDTO = new CategoryWithProductDTO
         {
@@ -66,7 +70,7 @@ public class CategoryServices
                 Description = p.Description,
                 ProductId = p.ProductId,
                 Stock = p.Stock,
-                Image = p.Image,
+                Image = string.IsNullOrEmpty(p.Image) ? null : $"{request?.Scheme}://{request?.Host}{p.Image}",
                 PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
                 SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
             }).ToList() ?? new List<ProductDTO>()
@@ -84,6 +88,7 @@ public class CategoryServices
         {
             return Result<CategoryWithProductDTO>.Failure(ErrorCode.NotFound, "Category not found");
         }
+        var request = _httpContextAccessor.HttpContext?.Request;
 
         var categoryDTO = new CategoryWithProductDTO
         {
@@ -96,7 +101,7 @@ public class CategoryServices
                 Description = p.Description,
                 ProductId = p.ProductId,
                 Stock = p.Stock,
-                Image = p.Image,
+                Image = string.IsNullOrEmpty(p.Image) ? null : $"{request?.Scheme}://{request?.Host}{p.Image}",
                 PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
                 SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
             }).ToList() ?? new List<ProductDTO>()

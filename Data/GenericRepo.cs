@@ -1,67 +1,72 @@
-﻿using HandmadeMarket.Migrations;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Collections.Generic;
 
 namespace HandmadeMarket.Data
 {
     public class GenericRepo<T> : IGenericRepo<T> where T : class
     {
-        HandmadeContext context;
-        DbSet<T> _dbSet;
+        private readonly HandmadeContext context;
+        private readonly DbSet<T> _dbSet;
+
         public GenericRepo(HandmadeContext _context)
         {
             context = _context;
-            _dbSet = _context.Set<T>();
-
+            _dbSet = context.Set<T>();
         }
+
         public async Task Add(T obj)
         {
-            await context.Set<T>().AddAsync(obj);
+            await _dbSet.AddAsync(obj);
         }
 
-        public virtual IEnumerable<T> GetAll()
+        public  IEnumerable<T> GetAll()
         {
-            return _dbSet;
+            return  _dbSet.ToList();
         }
 
-        public virtual T GetById(int Id)
+        public T GetById(int id)
         {
-            return _dbSet.Find(Id);
+            return  _dbSet.Find(id);
         }
 
-
-        public void Remove(int id)
+        public async Task Remove(int id)
         {
-
-            _dbSet.Remove(_dbSet.Find(id));
-        }
-        public async Task<bool> RemovebyExpression(Expression<Func<T, bool>> Predicate)
-        {
-            T? result = await context.Set<T>().FirstOrDefaultAsync(Predicate);
-            if (result is not null)
+            var entity = await _dbSet.FindAsync(id);
+            if (entity != null)
             {
-                context.Set<T>().Remove(result);
+                _dbSet.Remove(entity);
+            }
+        }
+        public async Task<bool> RemoveByExpression(Expression<Func<T, bool>> predicate)
+        {
+            var entity = await _dbSet.FirstOrDefaultAsync(predicate);
+            if (entity != null)
+            {
+                _dbSet.Remove(entity);
                 return true;
             }
             return false;
         }
 
-        public  void Update(int id, T obj)
+        public async Task Update(int id, T obj)
         {
-            var existingEntity = _dbSet.Find(id);
+            var existingEntity = await _dbSet.FindAsync(id);
             if (existingEntity != null)
             {
                 context.Entry(existingEntity).CurrentValues.SetValues(obj);
             }
         }
+
         public IQueryable<T> GetAllWithFilter(Expression<Func<T, bool>> expression)
         {
-            return context.Set<T>().Where(expression);
+            return _dbSet.Where(expression);
         }
-        public void Save()
+
+        public async Task SaveAsync()
         {
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
+
+       
     }
 }

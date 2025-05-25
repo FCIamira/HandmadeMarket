@@ -7,6 +7,8 @@ namespace HandmadeMarket.Interfaces
     {
         public List<CartWithProductDTO> CategoryDTO();
         public IEnumerable<Cart> GetByUserId(string userId);
+        Task<bool> IsProductInCartAsync(int productId);
+
 
 
     }

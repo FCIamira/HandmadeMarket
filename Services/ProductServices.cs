@@ -22,9 +22,9 @@ namespace HandmadeMarket.Services
             _httpContextAccessor = httpContextAccessor;
         }
         #region GetAllProduct
-        public Result<ResponseGetAllProduct> GetAllProduct(int pageNumber = 1, int pageSize = 10)
+        public async Task<Result<ResponseGetAllProduct>> GetAllProduct(int pageNumber = 1, int pageSize = 10)
         {
-            IEnumerable<Product> products = unitOfWork.Product.GetAll();
+            IEnumerable<Product> products =  unitOfWork.Product.GetAll();
 
             if (products == null || !products.Any())
             {
@@ -46,8 +46,7 @@ namespace HandmadeMarket.Services
                 Description = p.Description,
                 Price = p.Price,
                 Stock = p.Stock,
-                //Image = string.IsNullOrEmpty(p.Image) ? null : $"{request?.Scheme}://{request?.Host}{p.Image}",
-                Image = p.Image,
+                Image = string.IsNullOrEmpty(p.Image) ? null : $"{request?.Scheme}://{request?.Host}{p.Image}",
 
                 PriceAfterSale = p.PriceAfterSale > 0 ? p.PriceAfterSale : p.Price,
                 SalePercentage = p.SalePercentage > 0 ? p.SalePercentage : 0,
@@ -96,9 +95,9 @@ namespace HandmadeMarket.Services
 
         #region GetProductById
 
-        public Result<ProductDTO> GetProductById(int id)
+        public async Task<Result<ProductDTO>> GetProductById(int id)
         {
-            Product product = unitOfWork.Product.GetById(id);
+            Product product =  unitOfWork.Product.GetById(id);
             if (product == null)
             {
                 return Result<ProductDTO>.Failure(ErrorCode.NotFound, " Product Not Found");
@@ -212,6 +211,7 @@ namespace HandmadeMarket.Services
 
                 Product product1 = unitOfWork.Product.GetById(product.ProductId);
 
+
                 var resultDTO = new ProductDTO
                 {
                     ProductId = product1.ProductId,
@@ -309,17 +309,27 @@ namespace HandmadeMarket.Services
 
         #region delete product
 
-        public Result<string> DeleteProduct(int id)
+        public async Task<Result<string>> DeleteProductAsync(int id)
         {
-            Product product = unitOfWork.Product.GetById(id);
+            Product product =  unitOfWork.Product.GetById(id);
             if (product == null)
             {
                 return Result<string>.Failure(ErrorCode.NotFound, "Product not found");
             }
+            bool isProductInCart = await unitOfWork.Cart.IsProductInCartAsync(id);
+            if (isProductInCart)
+            {
+                return Result<string>.Failure(ErrorCode.Conflict, "Cannot delete product, it exists in user carts.");
+            }
+
             unitOfWork.Product.Remove(id);
-            unitOfWork.SaveChangesAsync();
-            return Result<string>.Success("Product Deleded");
+            await unitOfWork.SaveChangesAsync();
+
+            return Result<string>.Success("Product Deleted");
         }
+
+
+
         #endregion
 
 

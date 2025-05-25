@@ -19,9 +19,9 @@ namespace HandmadeMarket.Controllers
 
         #region GetAll
         [HttpGet]
-        public IActionResult GetAllProduct(int pageNumber = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllProduct(int pageNumber = 1, int pageSize = 10)
         {
-            var result = productServices.GetAllProduct(pageNumber, pageSize);
+            var result = await productServices.GetAllProduct(pageNumber, pageSize);
             return result.ToActionResult();
         }
         #endregion
@@ -37,9 +37,9 @@ namespace HandmadeMarket.Controllers
 
         #region GetProductById
         [HttpGet("{id}")]
-        public IActionResult GetProductById(int id)
+        public async Task<IActionResult> GetProductById(int id)
         {
-            var result = productServices.GetProductById(id);
+            var result = await productServices.GetProductById(id);
             return result.ToActionResult();
         }
         #endregion
@@ -81,9 +81,9 @@ namespace HandmadeMarket.Controllers
 
         #region Delete product
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteProduct(int id)
+        public async Task<IActionResult> DeleteProduct(int id)
         {
-            var result = productServices.DeleteProduct(id);
+            var result = await  productServices.DeleteProductAsync(id);
             return result.ToActionResult();
         }
         #endregion

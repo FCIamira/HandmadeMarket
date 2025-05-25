@@ -24,6 +24,7 @@ namespace HandmadeMarket.Repository
 
 
       
+
         public void DeleteProduct(int id)
         {
             Product? product = context.Products

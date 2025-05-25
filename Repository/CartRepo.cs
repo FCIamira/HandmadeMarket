@@ -26,9 +26,9 @@ namespace HandmadeMarket.Repository
             ).ToList();
             return carts;
         }
-        public override IEnumerable<Cart> GetAll()
+        public   IEnumerable<Cart> GetAll()
         {
-            return handmadeContext.Carts.Include(c => c.Product).ToList();
+            return   handmadeContext.Carts.Include(c => c.Product).ToList();
         }
 
         public IEnumerable<Cart> GetByUserId(string userId)
@@ -39,14 +39,18 @@ namespace HandmadeMarket.Repository
                 .ToList();
         }
 
-
-        public override Cart GetById(int id)
+        
+        public    Cart GetById(int id)
         {
-            return handmadeContext.Carts
+            return  handmadeContext.Carts
                 .Include(c => c.Product)
                 .FirstOrDefault(c => c.Id == id);
         }
 
+        public async Task<bool> IsProductInCartAsync(int productId)
+        {
+            return await handmadeContext.Carts.AnyAsync(c => c.ProductId == productId);
+        }
 
     }
 }

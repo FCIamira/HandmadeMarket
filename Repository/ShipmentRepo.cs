@@ -9,7 +9,7 @@ namespace HandmadeMarket.Repository
         {
             this.context = context;
         }
-        public override IEnumerable<Shipment> GetAll()
+        public  IEnumerable<Shipment> GetAll()
         {
             return context.Shipments
                 .Include(s => s.Orders)
@@ -19,7 +19,7 @@ namespace HandmadeMarket.Repository
                           .ToList();
         }
 
-        public override Shipment GetById(int id)
+        public  Shipment GetById(int id)
         {
             return context.Shipments
                  .Include(o => o.Customer)

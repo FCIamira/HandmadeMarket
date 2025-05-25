@@ -123,12 +123,7 @@ namespace HandmadeMarket
 
             var app = builder.Build();
             app.UseStaticFiles();
-        //    app.UseStaticFiles(new StaticFileOptions
-        //    {
-        //        FileProvider = new PhysicalFileProvider(
-        //Path.Combine(Directory.GetCurrentDirectory(), "uploads")),
-        //        RequestPath = "/uploads"
-        //    });
+
 
             // Seed Default Roles
             using (var scope = app.Services.CreateScope())
